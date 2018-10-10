@@ -350,9 +350,9 @@ subroutine Matrix_AB(ng,Nmat,dim,totNFM,ngauss,mu,fmmid,SigT,Delta,Q_ni,A,B)
        enddo
 end subroutine Matrix_AB
 !BL14
-subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
+subroutine current_f(BC,scheme,A,B,ng,ngauss,totNFM,dim,curr)
        implicit none
-       CHARACTER(50), intent(in) :: BC
+       CHARACTER(50), intent(in) :: BC, scheme
        integer(kind=4), intent(in) :: ng,ngauss,totNFM,dim
        real(kind=8), dimension(dim,ngauss*ng), intent(in) :: A,B
        real(kind=8), dimension((totNFM+1)*ng,ngauss*ng), intent(out) :: curr
@@ -367,7 +367,13 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                         m = k1*totNFM
                 do  i = k1*totNFM+k1-1,k0,-1 ! right-to-left
                     do  j=1,(ngauss/2)
+                        if (scheme == 'DD0') then
+                        al = (2.-A(m,j+k2-1))/(2.+A(m,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6*A(m,j+k2-1)+A(m,j+k2-1)**2)/(12.+6*A(m,j+k2-1)+A(m,j+k2-1)**2)
+                        else
                         al = exp(-A(m,j+k2-1))
+                        endif
                         curr(i,j+k2-1) = curr(i+1,j+k2-1)*al + B(m,j+k2-1)*(1-al)
                     enddo
                         m = m - 1
@@ -376,7 +382,13 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                         n = m + 1 
                 do  i = k0,k1*totNFM+k1-1   ! left-to-right
                     do  j=ngauss,(ngauss/2)+1,-1
+                        if (scheme == 'DD0') then
+                        al = (2.-A(n,j+k2-1))/(2.+A(n,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6*A(n,j+k2-1)+A(n,j+k2-1)**2)/(12.+6*A(n,j+k2-1)+A(n,j+k2-1)**2)
+                        else
                         al = exp(-A(n,j+k2-1))
+                        endif
                         curr(i+1,j+k2-1) = curr(i,j+k2-1)*al + B(n,j+k2-1)*(1-al)
                     enddo
                         n = n + 1
@@ -391,7 +403,13 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                         m = k1*totNFM
                 do  i = k1*totNFM+k1-1,k0,-1 ! right-to-left 
                     do  j=1,(ngauss/2)
+                        if (scheme == 'DD0') then
+                        al = (2.-A(m,j+k2-1))/(2.+A(m,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6*A(m,j+k2-1)+A(m,j+k2-1)**2)/(12.+6*A(m,j+k2-1)+A(m,j+k2-1)**2)
+                        else
                         al = exp(-A(m,j+k2-1))
+                        endif
                         curra(k1*totNFM+k1,j + k2 -1) = 0.0
                         currb(k1*totNFM+k1,j + k2 -1) = 1.0
                         curra(i,j+k2-1) = curra(i+1,j+k2-1)*al + B(m,j+k2-1)*(1-al)
@@ -407,7 +425,13 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                     do  j=ngauss,(ngauss/2)+1,-1
                         curra(k0,j+k2-1) = 0.0
                         currb(k0,j+k2-1) = 1.0
+                        if (scheme == 'DD0') then
+                        al = (2.-A(n,j+k2-1))/(2.+A(n,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6*A(n,j+k2-1)+A(n,j+k2-1)**2)/(12.+6*A(n,j+k2-1)+A(n,j+k2-1)**2)
+                        else
                         al = exp(-A(n,j+k2-1))
+                        endif
                         curra(i+1,j+k2-1) = curra(i,j+k2-1)*al + B(n,j+k2-1)*(1-al)
                         currb(i+1,j+k2-1) = currb(i,j+k2-1)*al + B(n,j+k2-1)*(1-al)
                         !   Conditions au limite
@@ -425,7 +449,13 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                         m = k1*totNFM
                 do  i = k1*totNFM+k1-1,k0,-1 ! right-to-left 
                     do  j=1,(ngauss/2)
+                        if (scheme == 'DD0') then
+                        al = (2.-A(m,j+k2-1))/(2.+A(m,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6*A(m,j+k2-1)+A(m,j+k2-1)**2)/(12.+6*A(m,j+k2-1)+A(m,j+k2-1)**2)
+                        else
                         al = exp(-A(m,j+k2-1))
+                        endif
                         curr(i,j+k2-1) = curr(i+1,j+k2-1)*al + B(m,j+k2-1)*(1-al)
                     enddo
                         m = m - 1
@@ -433,7 +463,13 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                         n = m + 1
                 do  i = k0,k1*totNFM+k1-1    ! left-to-right
                     do  j=ngauss,(ngauss/2)+1,-1
+                        if (scheme == 'DD0') then
+                        al = (2.-A(n,j+k2-1))/(2.+A(n,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6*A(n,j+k2-1)+A(n,j+k2-1)**2)/(12.+6*A(n,j+k2-1)+A(n,j+k2-1)**2)
+                        else
                         al = exp(-A(n,j+k2-1))
+                        endif
                         curr(i+1,j+k2-1) = curr(i,j+k2-1)*al + B(n,j+k2-1)*(1-al)
                     enddo
                         n = n + 1
@@ -448,7 +484,13 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                 do  i = k0,k1*totNFM+k1-1    ! left-to-right
                     do  j=(ngauss/2+1),ngauss
                         curr(k0,j + k2 -1) = 0.0
+                        if (scheme == 'DD0') then
+                        al = (2.-A(n,j+k2-1))/(2.+A(n,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6.*A(n,j+k2-1)+A(n,j+k2-1)**2)/(12.+6.*A(n,j+k2-1)+A(n,j+k2-1)**2)
+                        else
                         al = exp(-A(n,j+k2-1))
+                        endif
                         curr(i+1,j+k2-1) =  curr(i,j+k2-1)*al + B(n,j+k2-1)*(1-al)             
                     enddo
                     n = n + 1
@@ -457,7 +499,13 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                     m = n - 1
                 do  i = k1*totNFM+k1-1,k0,-1 ! right-to-left
                     do  j=1,(ngauss/2)
+                        if (scheme == 'DD0') then
+                        al = (2.-A(m,j+k2-1))/(2.+A(m,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6*A(m,j+k2-1)+A(m,j+k2-1)**2)/(12.+6*A(m,j+k2-1)+A(m,j+k2-1)**2)
+                        else
                         al = exp(-A(m,j+k2-1))
+                        endif
                         curr(k1*totNFM+k1,j+k2 -1) = curr(k1*totNFM+k1,ngauss-j+k2)
                         curr(i,j+k2-1) = curr(i+1,j+k2-1)*al + B(m,j+k2-1)*(1-al)
                     enddo
@@ -471,7 +519,14 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                     m = k1*totNFM
                 do  i = k1*totNFM+k1-1,k0,-1 ! right-to-left 
                     do  j=(ngauss/2),1,-1
+                        if (scheme == 'DD0') then
+                        al = (2.-A(m,j+k2-1))/(2.+A(m,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6.*A(m,j+k2-1)+A(m,j+k2-1)*A(m,j+k2-1))/(12.&
+                             +6.*A(m,j+k2-1)+A(m,j+k2-1)*A(m,j+k2-1))
+                        else
                         al = exp(-A(m,j+k2-1))
+                        endif
                         curr(k1*totNFM+k1,j + k2 -1) = 0.0
                         curr(i,j+k2-1) = curr(i+1,j+k2-1)*al + B(m,j+k2-1)*(1-al)
                     enddo
@@ -480,7 +535,14 @@ subroutine current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
                     n = m + 1
                 do  i = k0,k1*totNFM+k1-1    ! left-to-right
                     do  j=(ngauss/2+1),ngauss
+                        if (scheme == 'DD0') then
+                        al = (2.-A(n,j+k2-1))/(2.+A(n,j+k2-1))
+                        elseif (scheme == 'DD1') then
+                        al = (12.-6.*A(n,j+k2-1)+A(n,j+k2-1)*A(n,j+k2-1))/(12.&
+                             +6.*A(n,j+k2-1)+A(n,j+k2-1)*A(n,j+k2-1))
+                        else
                         al = exp(-A(n,j+k2-1))
+                        endif
                         curr(k0,j + k2 -1) = curr(k0,ngauss-j+k2) 
                         curr(i+1,j+k2-1) = curr(i,j+k2-1)*al + B(n,j+k2-1)*(1-al)
                     enddo
@@ -524,7 +586,7 @@ subroutine flux_moy(A,B,ng,ngauss,totNFM,dim,curr,flux_ni)
             enddo
 end subroutine flux_moy
 !BL16
-subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,wt,mu,D,F,U,L,p,BC,fmmid,&
+subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,wt,mu,D,F,U,L,p,BC,scheme,fmmid,&
                         SigT,flux_ni,flux_li,Delta,k_eff,phi)
        implicit none
        integer(kind=4), intent(in) :: ng,dim,totNFM,ngauss,order,Nmat,Max_it
@@ -549,7 +611,7 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
        real(kind=8), dimension(ng) :: moy 
        real(kind=8) :: err_k_eff, err_phi, k_eff0, eval1, eval2,Del,Sig,muu,err_flux
        integer(kind=4) :: i,n,k0,k2,k1
-       CHARACTER(50), intent(in) :: BC
+       CHARACTER(50), intent(in) :: BC, scheme
 !      convergence parameters
        inter=0
        err_k_eff = 1.0
@@ -588,7 +650,7 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
                  call Scattering_Source(ng,dim,ngauss,order,totNFM,D,U,L,flux_li,p,SQ_ni)
                  call Total_Source(ng,dim,ngauss,FQ_ni,SQ_ni,Q_ni)
                  call Matrix_AB(ng,Nmat,dim,totNFM,ngauss,mu,fmmid,SigT,Delta,Q_ni,A,B)
-                 call current_f(BC,A,B,ng,ngauss,totNFM,dim,curr)
+                 call current_f(BC,scheme,A,B,ng,ngauss,totNFM,dim,curr)
                  call flux_moy(A,B,ng,ngauss,totNFM,dim,curr,flux_ni)
 
                  flux_li = 0.0
@@ -677,8 +739,8 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,tot
         write (100, FMT=* ) 'ERSN, UNIVERSITY ABDELMALEK ESSAADI FACULTY OF SCIENCES - TETOUAN, MOROCCO'
         write (100, FMT=* ) 'CODE  DEVELOPED  BY  MOHAMED  LAHDOUR,  PHD  STUDENT'
         write (100, FMT=* ) 'NTP-ERSN:        MOC  MOETHOD OF CHARACTERISTICS'
-        write (100, FMT=* ) 'VERSION NUMBER:  1.0'
-        write (100, FMT=* ) 'VERSION DATE:    21  JULY  2018'
+        write (100, FMT=* ) 'VERSION NUMBER:  1.1'
+        write (100, FMT=* ) 'VERSION DATE:    8  OTOBER  2018'
         write (100,3010) 'RAN ON:          ', start,'(H/M/S)'
         write (100, FMT=* ) '********************************************************************************'
         write (100, FMT=* ) '           ----------------------------------------------------------' 
@@ -792,7 +854,7 @@ subroutine title1()
        '      ╚═╝  ╚═══╝   ╚═╝   ╚═╝           ╚══════╝&
        &╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝',& 
          '______________________________________________________________________________'
-       write(*,FMT=*) '                                                   Version Number: 1.0 '
+       write(*,FMT=*) '                                                   Version Number: 1.1 '
        write(*,FMT=*) '     Copyright:      2015-2018 FS-Tetouan University Abdelmalk Essaadi '
        write ( *, FMT=* ) '.'
        write ( *, FMT=* ) '   FORTRAN90 version'  

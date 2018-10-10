@@ -85,7 +85,7 @@
            endif
        endif
     end function en
-!BL4  
+!BL4   
     function fii(signe,taux,SigTi,li)
        implicit none
        real(kind=8), intent(in) :: signe
@@ -358,7 +358,7 @@
                     enddo
             enddo
     end subroutine 
-!BL14 
+!BL14    
     subroutine Matrix_U(SigS,fmmid,U,ng,totNFM,Nmat,dim)
        implicit none
        integer(kind=4), intent(in) :: ng,totNFM,Nmat,dim
@@ -541,8 +541,8 @@ subroutine Output(start,albedo,tm,k_eff,SigT,NusigF,SigS,Chi,dcell,phi,eps,totNF
         write (100, FMT=* ) 'ERSN, UNIVERSITY ABDELMALEK ESSAADI FACULTY OF SCIENCES - TETOUAN, MOROCCO'
         write (100, FMT=* ) 'CODE  DEVELOPED  BY  MOHAMED  LAHDOUR,  PHD  STUDENT'
         write (100, FMT=* ) 'NTP-ERSN:        CP COLLISION PROBABILITY METHOD'
-        write (100, FMT=* ) 'VERSION NUMBER:  1.0'
-        write (100, FMT=* ) 'VERSION DATE:    21  JULY  2018'
+        write (100, FMT=* ) 'VERSION NUMBER:  1.1'
+        write (100, FMT=* ) 'VERSION DATE:    8  OTOBER  2018'
         write (100,3010) 'RAN ON:          ', start,'(H/M/S)'
         write (100, FMT=* ) '********************************************************************************'
         write (100, FMT=* ) '           ----------------------------------------------------------' 
@@ -706,7 +706,7 @@ end subroutine Output
        '      ╚═╝  ╚═══╝   ╚═╝   ╚═╝           ╚══════╝&
        &╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝',& 
        '______________________________________________________________________________'
-       write(*,FMT=*) '                                                   Version Number: 1.0 '     
+       write(*,FMT=*) '                                                   Version Number: 1.1 '     
        write(*,FMT=*) '     Copyright:      2015-2018 FS-Tetouan University Abdelmalk Essaadi '
        write ( *, FMT=* ) '.'
        write ( *, FMT=* ) '   FORTRAN90 version' 

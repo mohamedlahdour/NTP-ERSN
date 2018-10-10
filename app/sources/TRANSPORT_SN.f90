@@ -513,7 +513,7 @@ subroutine current_f(BC,A,B,Q_ni,curr,ng,ngauss,dim,totNFM)
         endif
 end subroutine current_f
 !BL15
-subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,wt,mu,&
+subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,scheme,eps,wt,mu,&
                           D,F,U,L,A,B,p,BC,SigT,flux_ni,flux_li,Delta,k_eff,phi)
        implicit none 
        integer(kind=4), intent(in) :: ng,dim,totNFM,ngauss,order,Nmat,Max_it
@@ -535,9 +535,9 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
        real(kind=8), dimension((totNFM+1)*ng,ngauss*ng) :: curr
        real(kind=8), dimension(dim,order) :: flux_li0
        real(kind=8), dimension(ng) :: moy 
-       real(kind=8) :: err_k_eff, err_phi, k_eff0, eval1, eval2,Del,Sig,muu,err_flux
+       real(kind=8) :: err_k_eff, err_phi, k_eff0, eval1, eval2,Del,Sig,muu,err_flux,alpha
        integer(kind=4) :: i,j,m,n,k0,k2,k1
-       CHARACTER(50), intent(in) :: BC
+       CHARACTER(50), intent(in) :: BC, scheme
 !      convergence parameters
        inter=0
        err_k_eff = 1.0
@@ -583,14 +583,24 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
                         m = k1*totNFM+k1-1
                 do  i = k1*totNFM,k0,-1 ! right-to-left 
                     do  j=(ngauss/2),1,-1
-                        flux_ni(i,j+k2-1) = 0.5*(curr(m+1,j+k2-1) + curr(m,j+k2-1))
+                        if (scheme == 'Diamond Difference') then
+                           alpha = 0
+                        else
+                           alpha = abs(mu(j))/mu(j)
+                        endif
+                        flux_ni(i,j+k2-1) = 0.5*((1+alpha)*curr(m+1,j+k2-1) + (1-alpha)*curr(m,j+k2-1))
                     enddo
                         m = m - 1
                 enddo        
                         n = m + 1
                 do  i = k0,k1*totNFM    ! left-to-right
                     do  j=ngauss,(ngauss/2)+1,-1
-                        flux_ni(i,j+k2-1) = 0.5*(curr(n+1,j+k2-1) + curr(n,j+k2-1)) 
+                        if (scheme == 'Diamond Difference') then
+                           alpha = 0
+                        else
+                           alpha = abs(mu(j))/mu(j)
+                        endif
+                        flux_ni(i,j+k2-1) = 0.5*((1+alpha)*curr(n+1,j+k2-1) + (1-alpha)*curr(n,j+k2-1)) 
                     enddo
                         n = n + 1
                 enddo
@@ -686,8 +696,8 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,tot
         write (100, FMT=* ) 'ERSN, UNIVERSITY ABDELMALEK ESSAADI FACULTY OF SCIENCES - TETOUAN, MOROCCO'
         write (100, FMT=* ) 'CODE  DEVELOPED  BY  MOHAMED  LAHDOUR,  PHD  STUDENT'
         write (100, FMT=* ) 'NTP-ERSN:        SN  DISCRETE  ORDINATES  METHOD'
-        write (100, FMT=* ) 'VERSION NUMBER:  1.0'
-        write (100, FMT=* ) 'VERSION DATE:    21  JULY  2018'
+        write (100, FMT=* ) 'VERSION NUMBER:  1.1'
+        write (100, FMT=* ) 'VERSION DATE:    8  OTOBER  2018'
         write (100,3010) 'RAN ON:          ', start,'(H/M/S)'
         write (100, FMT=* ) '********************************************************************************'
         write (100, FMT=* ) '           ----------------------------------------------------------' 
@@ -800,7 +810,7 @@ subroutine title1()
        '      ╚═╝  ╚═══╝   ╚═╝   ╚═╝           ╚══════╝&
        &╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝',&
          '______________________________________________________________________________'
-       write(*,FMT=*) '                                                   Version Number: 1.0 '
+       write(*,FMT=*) '                                                   Version Number: 1.1 '
        write(*,FMT=*) '     Copyright:      2015-2018 FS-Tetouan University Abdelmalk Essaadi '
        write ( *, FMT=* ) '. '
        write ( *, FMT=* ) '   FORTRAN90 version'  

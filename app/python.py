@@ -58,8 +58,8 @@ if MOC_Method == str(1):
         del nfmesh            
         SlabMOC.title1()
         SlabMOC.timestamp()
-        it,inter,k_eff,phi = SlabMOC.outer_iteration(Max_it,eps,wt,mu,d,f,u,l,p,BC,fmmid,sigt,
-                                    flux_ni,flux_li,delta,[ng,dim,totnfm,ngauss,order,nmat])
+        it,inter,k_eff,phi = SlabMOC.outer_iteration(Max_it,eps,wt,mu,d,f,u,l,p,BC,scheme2,fmmid,sigt,
+                             flux_ni,flux_li,delta,[ng,dim,totnfm,ngauss,order,nmat])
         interval = datetime.now()-start  
         print '  Total time to solution      ........................     ', interval  
         SlabMOC.title2()
@@ -105,8 +105,8 @@ elif Sn_Method == str(1):
         del fmmid,nfmesh
         SlabSN.title1()
         SlabSN.timestamp()
-        it,inter,k_eff,phi = SlabSN.outer_iteration(Max_it,eps,wt,mu,d,f,u,l,a,b,p,BC,sigt,
-                                    flux_ni,flux_li,delta,[ng,dim,totnfm,ngauss,order,nmat])
+        it,inter,k_eff,phi = SlabSN.outer_iteration(Max_it,scheme1,eps,wt,mu,d,f,u,l,a,b,p,BC,sigt,
+                             flux_ni,flux_li,delta,[ng,dim,totnfm,ngauss,order,nmat])
         interval = datetime.now()-start  
         print '  Total time to solution      ........................     ', interval   
         SlabSN.title2()

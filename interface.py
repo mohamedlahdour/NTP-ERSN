@@ -106,8 +106,8 @@ class RedirectText(Thread):
 class Application(Frame):
     from app.func import plot,new_file,search_for,show_info_bar,update_line_number,theme 
     from app.func import highlight_line,undo_highlight,toggle_highlight,select00,select01
-    from app.func import select02,select03,select04,select07,select08,popup,save
-    from app.func import save_as,undo,redo,cut,copy,paste,select_all,data_up,exit_editor
+    from app.func import select02,select03,select04,select07,select08,select09,select10,popup
+    from app.func import save,save_as,undo,redo,cut,copy,paste,select_all,data_up,exit_editor
     from app.func import Draw,save1,save2,save3,save4,save5,new1,new2,new3,new4,new5
     from app.func import on_find,open_file
     #----------------------------------------------------------------------
@@ -269,7 +269,7 @@ class Application(Frame):
         # construction Frame04
         Frame04 = LabelFrame(self.root2, width=155, height=40, text="Boundary conditions",
                             font=("Helvetica", 10), fg='blue',bg=self.pientur)
-        Frame04.grid(row=2,rowspan=2, column=3, sticky=NSEW)
+        Frame04.grid(row=2, column=3, sticky=NSEW)
         self.value08 = StringVar()
         self.value08.set(open('app/link/script08.py', "r" ).read())
         button = [0]*4
@@ -285,17 +285,41 @@ class Application(Frame):
             button[n].config(height=2,width=18)
             button[n].grid(row =n, column =0,sticky=NSEW)
 
-
+        #/////////////////////////////////////////////////////////////////////////////////////////
+        Frame09 = LabelFrame(self.root2, width=50, height=40, text="Approximation Scheme",
+                             font=("Helvetica", 10), fg='blue',bg=self.pientur)
+        Frame09.grid(row=3, column=3,sticky=NSEW)
+        self.value09 = StringVar()
+        self.value09.set(open('app/link/script09.py', "r" ).read())
+        # initial value
+        self.value09.set('Diamond Difference')
+        choices = ['Diamond Difference','Step Difference   ']
+        self.option = OptionMenu(Frame09, self.value09, *choices,  command =self.select09)
+        self.option["menu"].config(foreground='black')
+        self.option.config(height=2, width=16,highlightbackground='blue')
+        self.option.grid(row=0, column=0, sticky=NSEW)
+        hover = HoverInfo(self.option, 'Choose Discritization Scheme for the Discrete Ordinates (SN) Method') 
+        #-----------------------------------------------------------------------------------------
+        self.value10 = StringVar()
+        self.value10.set(open('app/link/script10.py', "r" ).read())
+        # initial value
+        self.value10.set('Step Characteristics')
+        choices = ['Step Characteristics','DD0','DD1']
+        self.option = OptionMenu(Frame09, self.value10, *choices,  command =self.select10)
+        self.option["menu"].config(foreground='black')
+        self.option.config(height=2, width=16,highlightbackground='blue')
+        self.option.grid(row=1, column=0, sticky=NSEW)
+        hover = HoverInfo(self.option, 'Choose Discritization Scheme for the Method Of Characteristics (MOC)') 
         #/////////////////////////////////////////////////////////////////////////////////////////
         Frame10 = LabelFrame(self.root2, width=50, height=40, text="Geometry Visualization",
                             font=("Helvetica", 10), fg='blue',bg=self.pientur)
-        Frame10.grid(row=4, rowspan=3, column=3,sticky=NSEW)
+        Frame10.grid(row=4, column=3,sticky=NSEW)
 
         b1 = Button(Frame10, text ='Apply', command =self.Draw,relief='raised',borderwidth=4)
         b1.config(width=17)
         b1.config(bg=self.labell , fg='black',highlightbackground='blue')
         #b1.config(state="disabled")
-        b1.grid(row =4, column =4,sticky=NSEW)
+        b1.grid(row =4, column =3,sticky=NSEW)
 
         style = ttk.Style()
         style.configure('.', font=('Times', 11),fg='blue')
