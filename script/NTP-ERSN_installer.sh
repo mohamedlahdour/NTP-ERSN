@@ -7,22 +7,22 @@
 #sudo apt-get upgrade
 #echo "UPGRADE COMPLETED !"
 
-echo "--- installing the must-have pre-requisites"  
+echo "--- installing the prerequisistes"  
 # Python
 sudo apt-get install python-tk
-echo "Tkinter INSTALL COMPLETED !"
+echo "Tkinter INSTALLATIO COMPLETED !"
 sudo apt-get install python-pip
 pip install pygmyplot
 pip install image
 sudo apt-get install gfortran
-echo "FORTRAN INSTALL COMPLETED !"
+echo "FORTRAN INSTALLATION COMPLETED !"
 sudo apt install python-numpy
 pip install pygame
 sudo apt-get install python-opengl
 sudo apt-get install python-matplotlib
  
 echo "              *************************************************  "
-echo "                       INSTALL COMPLETED WITH SUCCES             "
+echo "                         INSTALLATION was COMPLETED              "
 echo "              *************************************************  "
 echo " "
 printf "Press 'CTRL+C' to exit : "

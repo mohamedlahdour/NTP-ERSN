@@ -424,17 +424,17 @@ def data_up(self):
             filename.write('\n      "Total number of energy groups": '+ self.ent0[0].get() +',')
             filename.write('\n      "Total number of Materials": '+ self.ent0[2].get() +',')
             filename.write('\n      "Total number of regions": '+ self.ent0[1].get() +',')
-            filename.write('\n      "Which material goes in each region": '+ str(self.REGMAT) +',')
-            filename.write('\n      "Size for each material per [cm]": '+ str(self.Delta) +',')
+            filename.write('\n      "Which material fills each region": '+ str(self.REGMAT) +',')
+            filename.write('\n      "Size of each region [cm]": '+ str(self.Delta) +',')
             filename.write('\n      "Number of fine meshes": '+ str(self.NFMR) +',')  
             filename.write('\n      "Number of Angular Discretization": '+ self.ent0[3].get() +',')
-            filename.write('\n      "The l-order Legendre polonomial": '+ self.ent0[4].get() +',')
-            filename.write('\n      "Maximum Iteration": '+ self.ent1[0].get() +',')
-            filename.write('\n      "Epsilon Keff": '+ self.ent1[1].get())
+            filename.write('\n      "The l-order Legendre polynomial": '+ self.ent0[4].get() +',')
+            filename.write('\n      "Maximum Number of Iterations": '+ self.ent1[0].get() +',')
+            filename.write('\n      "Criterion of Keff convergence": '+ self.ent1[1].get())
             filename.write('\n    }, \n    "materials": [')
             # Ici Boucle
             for i in range(self.nmat):
-                filename.write('\n      { \n        "id": '+ str(i+1) +', \n        "nom": "material '+ str(i+1) +'",') 
+                filename.write('\n      { \n        "id": '+ str(i+1) +', \n        "name": "material '+ str(i+1) +'",') 
                 filename.write('\n        "XSTotal": ' + str(self.SigT[i][:]) +',' + '\n        "XSNuFission": '+ str(self.NuSigF[i][:])+',')
                 filename.write('\n        "XSScatter Matrix":'+str(self.SigS[i][:][:][:])+','+ '\n        "XSChi":  '+str(self.Chi[i][:]))
                 if i == self.nmat-1:
@@ -701,7 +701,7 @@ def run(event=None):
             print text
 
     if  Test == str(a):
-        tkMessageBox.showwarning("Warning", "finished running case")
+        tkMessageBox.showwarning("Warning", "Running case finished")
     else:
         tkMessageBox.showwarning("Warning", "Check Error")
          

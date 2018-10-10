@@ -704,14 +704,14 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,tot
         write (100, FMT=* ) '                     INPUT  PARAMETER - VALUES  FROM  INPUT'              
         write (100, FMT=* ) '           ----------------------------------------------------------'
         write (100, FMT=* ) ''
-        write (100, FMT=* ) 'ENERGY GROUP NUMBER:             ',ng
-        write (100, FMT=* ) 'REGIONS NUMBER:                  ',nregion
-        write (100, FMT=* ) 'MATERIALS NUMBER:                ',Nmat
-        write (100,3040)    'SIZE FOR EACH MATERIAL PER [CM]: ',dcell       
-        write (100, FMT=* ) 'DISCRETIZATIONS ANGULAR:         ',ngauss
-        write (100, FMT=* ) 'ORDER LEGENDRE POLONOMIAL:       ',order-1
-        write (100, FMT=* ) 'TOTAL NUMBER OF FINE MESHES:     ',totNFM
-        write (100,3050)    'TOLERANCE KEFF AND FLUX:         ',eps
+        write (100, FMT=* ) 'ENERGY GROUPS NUMBER:                    ',ng
+        write (100, FMT=* ) 'REGIONS NUMBER:                          ',nregion
+        write (100, FMT=* ) 'MATERIALS NUMBER:                        ',Nmat
+        write (100,3040)    'SIZE OF EACH REGION [CM]:                ',dcell       
+        write (100, FMT=* ) 'ANGULAR DISCRETIZATIONS:                 ',ngauss
+        write (100, FMT=* ) 'ORDER LEGENDRE POLYNOMIAL:               ',order-1
+        write (100, FMT=* ) 'TOTAL NUMBER OF FINE MESHES:             ',totNFM
+        write (100,3050)    'CONVERGENCE CRITERION of KEFF AND FLUX:  ',eps
         write (100, FMT=* ) ''
         write (100, FMT=* ) '           ----------------------------------------------------------'
         write (100, FMT=* ) '                      CALCULATION  RUN-TIME  PARAMETERS  SN' 
