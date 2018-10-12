@@ -5,19 +5,19 @@
       "Total number of energy groups": 1,
       "Total number of Materials": 3,
       "Total number of regions": 4,
-      "Which material goes in each region":[2, 1, 2, 3],
+      "Which material fills each region":[2, 1, 2, 3],
       "Size for each material per [cm]": [0.317337461, 5.119720083,
                                           0.317337461, 2.002771002],
       "Number of fine meshes": [100, 100, 100, 100],
       "Number of Angular Discretization": 30,
-      "The l-order Legendre polonomial": 0,
-      "Maximum Iteration": 200,
-      "Epsilon Keff": 1.0e-8
+      "The l-order Legendre polynomial": 0,
+      "Maximum Number of Iterations": 200,
+      "Criterion of Keff convergence": 1.0e-8
     },
     "materials": [
       {
         "id": 1,
-        "nom": "U-235",
+        "name": "U-235",
         "XSTotal": [0.407407],
         "XSNuFission": [0.1730686],
         "XSScatter Matrix":[[0.328042]],
@@ -25,7 +25,7 @@
       },
       {
         "id": 2,
-        "nom": "Fe",
+        "name": "Fe",
         "XSTotal": [0.23256],
         "XSNuFission": [0.0],
         "XSScatter Matrix":[[0.23209488]],
@@ -33,7 +33,7 @@
       },
       {
         "id": 3,
-        "nom": "Na",
+        "name": "Na",
         "XSTotal": [0.086368032],
         "XSNuFission": [0.0],
         "XSScatter Matrix":[[0.086368032]],

@@ -30,14 +30,14 @@ if MOC_Method == str(1):
         ng = data['data']['parameter']['Total number of energy groups']  
         nmat = data['data']['parameter']['Total number of Materials']
         nregion = data['data']['parameter']['Total number of regions'] 
-        regmat = data['data']['parameter']['Which material goes in each region']
-        dcell = data['data']['parameter']['Size for each material per [cm]']
+        regmat = data['data']['parameter']['Which material fills each region']
+        dcell = data['data']['parameter']['Size of each region [cm]']
         nfmesh = data['data']['parameter']['Number of fine meshes']
         ngauss = data['data']['parameter']['Number of Angular Discretization']
-        order = data['data']['parameter']['The l-order Legendre polonomial']
+        order = data['data']['parameter']['The l-order Legendre polynomial']
         order = order + 1
-        Max_it = data['data']['parameter']['Maximum Iteration']
-        eps = data['data']['parameter']['Epsilon Keff']
+        Max_it = data['data']['parameter']['Maximum Number of Iterations']
+        eps = data['data']['parameter']['Criterion of Keff convergence']
         for i in range(nmat):
             sigt.append(data['data']['materials'][i]['XSTotal'])
             nusigf.append(data['data']['materials'][i]['XSNuFission'])
@@ -76,14 +76,14 @@ elif Sn_Method == str(1):
         ng = data['data']['parameter']['Total number of energy groups']  
         nmat = data['data']['parameter']['Total number of Materials']
         nregion = data['data']['parameter']['Total number of regions'] 
-        regmat = data['data']['parameter']['Which material goes in each region']
-        dcell = data['data']['parameter']['Size for each material per [cm]']
+        regmat = data['data']['parameter']['Which material fills each region']
+        dcell = data['data']['parameter']['Size of each region [cm]']
         nfmesh = data['data']['parameter']['Number of fine meshes']
         ngauss = data['data']['parameter']['Number of Angular Discretization']
-        order = data['data']['parameter']['The l-order Legendre polonomial']
+        order = data['data']['parameter']['The l-order Legendre polynomial']
         order = order + 1
-        Max_it = data['data']['parameter']['Maximum Iteration']
-        eps = data['data']['parameter']['Epsilon Keff']
+        Max_it = data['data']['parameter']['Maximum Number of Iterations']
+        eps = data['data']['parameter']['Criterion of Keff convergence']
         for i in range(nmat):
             sigt.append(data['data']['materials'][i]['XSTotal'])
             nusigf.append(data['data']['materials'][i]['XSNuFission'])
@@ -123,13 +123,13 @@ elif Pij_Method == str(1):
         ng = data['data']['parameter']['Total number of energy groups']        
         nmat = data['data']['parameter']['Total number of Materials']
         nregion = data['data']['parameter']['Total number of regions'] 
-        regmat = data['data']['parameter']['Which material goes in each region']
-        dcell = data['data']['parameter']['Size for each material per [cm]']
+        regmat = data['data']['parameter']['Which material fills each region']
+        dcell = data['data']['parameter']['Size of each region [cm]']
         nfmesh = data['data']['parameter']['Number of fine meshes']
-        Max_it = data['data']['parameter']['Maximum Iteration']
-        order =  data['data']['parameter']['The l-order Legendre polonomial']
+        Max_it = data['data']['parameter']['Maximum Number of Iterations']
+        order =  data['data']['parameter']['The l-order Legendre polynomial']
         order = order + 1
-        eps = data['data']['parameter']['Epsilon Keff']
+        eps = data['data']['parameter']['Criterion of Keff convergence']
         totnfm = sum(nfmesh)
         for i in range(nmat):
             sigtt.append(data['data']['materials'][i]['XSTotal'])

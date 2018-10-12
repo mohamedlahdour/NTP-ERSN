@@ -1,1 +1,1 @@
-/home/lahdour/Bureau/rapport/Article_First/MyApplication/tests/MgCriticalityAnalyticalBenchmarkTestSetForCriticalityCodeVerification/URR-6-0-SL.json
+/home/lahdour/correction/NTP-ERSN/app/input/input.json

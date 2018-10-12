@@ -698,7 +698,7 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,tot
         write (100, FMT=* ) 'NTP-ERSN:        SN  DISCRETE  ORDINATES  METHOD'
         write (100, FMT=* ) 'VERSION NUMBER:  1.1'
         write (100, FMT=* ) 'VERSION DATE:    8  OTOBER  2018'
-        write (100,3010) 'RAN ON:          ', start,'(H/M/S)'
+        write (100,3010) 'RAN ON:          ', start,'(H:M:S)'
         write (100, FMT=* ) '********************************************************************************'
         write (100, FMT=* ) '           ----------------------------------------------------------' 
         write (100, FMT=* ) '                     INPUT  PARAMETER - VALUES  FROM  INPUT'              
@@ -762,7 +762,7 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,tot
         endif
         write (100,3020)    'N. OUTER ITERATIONS      =',it1
         write (100,3020)    'TOTAL INNER ITERATIONS   =',it2
-        write (100,4000)    'TOTAL EXECUTION TIME     =',tm,'(H/M/S)'
+        write (100,4000)    'TOTAL EXECUTION TIME     =',tm,'(H:M:S)'
         write (100, FMT=* ) ''
         write (100, FMT=* ) '********************************************************************************'
         2000 format(1x,1p,i11,5x,200e16.5) 
@@ -770,7 +770,7 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,tot
         3010 format(1x,A17,A22,A10)
         3020 format(1x,A26,4x,i10)
         3040 format(1x,A33,2x,200F10.5)
-        3050 format(1x,1p,A33,4x,e8.1)
+        3050 format(1x,1p,A41,4x,e8.1)
         3060 format(1x,1p,i11,5x,e16.5,e16.5)
         3070 format(1x,A18,i4)
         3080 format(1x,1p,i11,5x,e16.5,e16.5,e16.5,e16.5,e16.5)

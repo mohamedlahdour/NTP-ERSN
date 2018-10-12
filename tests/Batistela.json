@@ -5,17 +5,18 @@
       "Total number of energy groups": 10,
       "Total number of Materials": 2,
       "Total number of regions": 3,
-      "Which material goes in each region":[1, 2, 1],
-      "Size for each material per [cm]":[20.00, 15.0, 20.00],
+      "Which material fills each region":[1, 2, 1],
+      "Size of each region [cm]":[20.00, 15.0, 20.00],
       "Number of fine meshes": [500, 375, 500],
       "Number of Angular Discretization": 2,
-      "The l-order Legendre polonomial": 0, 
-      "Epsilon Keff": 1.0e-8 
+      "The l-order Legendre polynomial": 0, 
+      "Maximum Number of Iterations": 200,
+      "Criterion of Keff convergence": 1.0e-8 
     },
     "materials": [
       {
         "id": 1,
-        "nom": "material 1",
+        "name": "material 1",
         "XSTotal": [0.691908, 1.163784, 1.146798, 1.281052, 0.35936, 0.2932, 0.52023, 0.71652, 0.43845, 0.07911],
         "XSNuFission": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         "XSScatter Matrix":[[[0.24413, 0.1741, 0.051, 0.2, 0.03, 0, 0, 0, 0, 0],
@@ -32,7 +33,7 @@
       },
       {
         "id": 2,
-        "nom": "material 2",
+        "name": "material 2",
         "XSTotal": [0.2245876, 0.5529316, 0.835548, 1.4625101, 0.12507, 0.26377, 0.644427, 0.8241506, 0.28768, 0.197631],
         "XSNuFission": [0.0009735, 0.001153, 0.01756, 0.238, 0.00081, 0.0035, 0.0123, 0.024, 0.005, 0.0009],
         "XSScatter Matrix":[[[0.16094, 0.05824, 0.003059, 0.00123, 0.00042, 0, 0, 0, 0, 0], 

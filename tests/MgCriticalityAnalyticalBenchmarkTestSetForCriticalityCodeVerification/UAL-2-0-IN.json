@@ -5,18 +5,18 @@
       "Total number of energy groups": 2,
       "Total number of Materials": 1,
       "Total number of regions": 1,
-      "Which material goes in each region":[1],
-      "Size for each material per [cm]":[15.661552],
+      "Which material fills each region":[1],
+      "Size of each region [cm]":[15.661552],
       "Number of fine meshes": [10],
       "Number of Angular Discretization": 300,
-      "The l-order Legendre polonomial": 0,
-      "Maximum Iteration": 200,
-      "Epsilon Keff": 1.0e-8
+      "The l-order Legendre polynomial": 0,
+      "Maximum Number of Iterations": 200,
+      "Criterion of Keff convergence": 1.0e-8
     },
     "materials": [
       {
         "id": 1,
-        "nom": "UAL-2-0-IN",
+        "name": "UAL-2-0-IN",
         "XSTotal": [1.276976, 0.268165],
         "XSNuFission": [0.171799376, 0.0],
         "XSScatter Matrix":[[[1.213127, 0.0000 ], 
@@ -26,6 +26,7 @@
     ]
   }
 }
+
 
 
 

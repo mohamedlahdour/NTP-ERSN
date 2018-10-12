@@ -33,7 +33,7 @@ def new1(self):
             self.newWindow.resizable(True,True)
             if  self.nregion <= 4:
                 self.newWindow.geometry("432x238+550+250")
-            self.newWindow.title("Parameters input for Sn Method")
+            self.newWindow.title("Parameters input")
             Frame01 = LabelFrame(self.newWindow, text="Size for each Region per [cm]",
                                  font=("Helvetica", 10), fg='blue',bg=self.boutton)
             Frame01.grid(row=0,column=0,sticky=NSEW)
@@ -68,7 +68,7 @@ def new1(self):
                 self.ent3[i+1].delete(0,'end')
                 self.ent3[i+1].insert(0,self.NFMR[i])
 
-            Frame03 = LabelFrame(self.newWindow, text="Which material goes in each region",
+            Frame03 = LabelFrame(self.newWindow, text="Which material fills each region",
                                  font=("Helvetica", 10), fg='blue',bg=self.boutton)
             Frame03.grid(row=2,column=0,sticky=NSEW)
             if len(self.tab1) > len(self.REGMAT):
@@ -110,7 +110,7 @@ def new2(self):
             if  self.nmat <= 3:
                 if  self.ngroup <= 4:
                     self.newWindow.geometry("432x180+550+250")
-            self.newWindow.title("Parameters input for Sn Method")
+            self.newWindow.title("Parameters input")
             Frame01 = LabelFrame(self.newWindow, text="Total Cross Section (SigT)",
                                  font=("Helvetica", 10), fg='blue',bg=self.boutton)
             Frame01.grid(columnspan=self.ngroup+1,rowspan=self.nmat+1,sticky=NSEW)
@@ -141,7 +141,7 @@ def new3(self):
         self.nmat   = int(self.ent0[2].get())
         self.tab3  = [[0]*self.ngroup]*self.nmat
         if  self.ngroup == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+            tkMessageBox.showwarning("Warning", "Enter the number of energy groups")
         elif self.nmat == 0:
             tkMessageBox.showwarning("Warning", "Enter the number of materials")
         else:
@@ -154,7 +154,7 @@ def new3(self):
             if  self.nmat <= 3:
                 if  self.ngroup <= 4:
                     self.newWindow.geometry("432x180+550+250")
-            self.newWindow.title("Parameters input for Sn Method")
+            self.newWindow.title("Parameters input")
             Frame01 = LabelFrame(self.newWindow, text="NuFission Cross Section (NuSigF)", 
                                  font=("Helvetica", 10),fg='blue',bg=self.boutton)
             Frame01.grid(columnspan=self.ngroup+1,rowspan=self.nmat+1,sticky=NSEW)
@@ -187,7 +187,7 @@ def new4(self):
         self.order   = int(self.ent0[4].get())
         self.tab4  = [[[[0]*self.ngroup]*self.ngroup]*self.nmat]*(self.order+1)
         if  self.ngroup == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+            tkMessageBox.showwarning("Warning", "Enter the number of energy groups")
         elif self.nmat == 0:
             tkMessageBox.showwarning("Warning", "Enter the number of materials")
         else:
@@ -201,7 +201,7 @@ def new4(self):
                 if self.nmat <=1:
                     if  self.ngroup <= 2:
                         self.newWindow.geometry("488x200+550+250")
-            self.newWindow.title("Parameters input for Sn Method")
+            self.newWindow.title("Parameters input")
             Frame01 = LabelFrame(self.newWindow, text="Scatter Cross Section (SigS)",
                                  font=("Helvetica", 10), fg='blue',bg=self.boutton)
             Frame01.grid(sticky=NSEW)
@@ -248,7 +248,7 @@ def new5(self):
         self.nmat   = int(self.ent0[2].get())
         self.tab5  = [[0]*self.ngroup]*self.nmat
         if  self.ngroup == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+            tkMessageBox.showwarning("Warning", "Enter the number of energy groups")
         elif self.nmat == 0:
             tkMessageBox.showwarning("Warning", "Enter the number of materials")
         else:
@@ -261,7 +261,7 @@ def new5(self):
             if  self.nmat <= 3:
                 if  self.ngroup <= 4:
                     self.newWindow.geometry("432x180+550+250")
-            self.newWindow.title("Parameters input for Sn Method")
+            self.newWindow.title("Parameters input")
             Frame01 = LabelFrame(self.newWindow, text="Density Function for Neutrons (Chi)",
                                 font=("Helvetica", 10), fg='blue',bg=self.boutton)
             Frame01.grid(sticky=NSEW)
@@ -368,10 +368,10 @@ def Draw(self):
         filename = open('app/link/script.py', "r" ).read()
         with open(filename) as json_data:
             data = json.load(json_data)
-            l = data['data']['parameter']['Size for each material per [cm]']
+            l = data['data']['parameter']['Size of each region [cm]']
             self.nmat = data['data']['parameter']['Total number of Materials']
             self.nregion = data['data']['parameter']['Total number of regions'] 
-            self.regmat = data['data']['parameter']['Which material goes in each region']
+            self.regmat = data['data']['parameter']['Which material fills each region']
         fig, ax = plt.subplots(figsize=(5, 4), dpi=100)
         width = [0]
         som = [0]
@@ -785,7 +785,6 @@ def about():
         a4.pack()
         b1=Button(newWindow,text="close", font='Times',bg='white',command=newWindow.destroy)
         b1.pack(pady=10)
-        #playsound('/app/sounds/Tick-268108.mp3')
 def help_box(event=None):
         newWindow = Toplevel()
         newWindow.overrideredirect(1)
@@ -798,7 +797,7 @@ def help_box(event=None):
         a1 = Label(newWindow, text="For Help Contact Us:")
         a1.config(fg='black',bg='grey76',font=("Helvetica", 11))
         a1.pack()
-        a2 = Label(newWindow, text="mohamedlahdour@gmail.com  &  tarekbardouni@uae.ma")
+        a2 = Label(newWindow, text="mlahdour@uae.ac.ma  &  telbardouni@uae.ac.ma")
         a2.config(fg='black',bg='grey76',font=("Helvetica", 11))
         a2.pack()
         b1=Button(newWindow,text="close", font='Times',bg='white',command=newWindow.destroy)
