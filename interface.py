@@ -171,7 +171,7 @@ class Application(Frame):
         self.value07.set(open('app/link/script07.py', "r" ).read())
         self.lab0 = [0]*5
         self.ent0 = [0]*5
-        for (n,field)  in [(0, 'Energy Group Number'),(1, 'Number of Regions'),
+        for (n,field)  in [(0, 'Energy Groups Number'),(1, 'Number of Regions'),
                            (2, 'Number of Materials'),(3, 'Angular Discretization'),
                            (4, 'Legendre Order') ]:
             Frame20 = LabelFrame(Frame02, width=155, height=40, bg=self.pientur)
