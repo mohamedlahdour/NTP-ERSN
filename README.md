@@ -3,7 +3,7 @@
 In this project we develop a package NTP-ERSN to solve a neutron transport equation.
 
 
-NTP-ERSN (Neutron Transport Package-Equipe de la Radiation et des systèmes nucleaires), is an open-source code, developed at the Abdelmalek Essaadi University, Tetouan, Morocco, written by FORTRAN90 for educational purposes to solve the equation of multi-group neutron transport in steady-state using a deterministic approach (Lahdour et al., 2019a) such as:
+NTP-ERSN (Neutron Transport Package-Equipe de la Radiation et des systèmes nucleaires), is an open-source code, developed at the Abdelmalek Essaadi University, Tetouan, Morocco, written by FORTRAN90 for educational purposes to solve the equation of multi-group neutron transport in steady-state using a deterministic approach [Lahdour et al., 2019a](https://doi.org/10.1016/j.apradiso.2018.12.004) such as:
 
 
 Neutron Transport Package NTP-ERSN(Open Neutron Transport Package from the Radiations and Nuclear Systems Group), is an open-source code written in FORTRAN90 for a pedagogical purpose to solve the steady-state multigroup neutron transport equation using either:
@@ -40,7 +40,7 @@ Quick Install Guide
 
 This quick install guide outlines the basic steps needed to install NTP-ERSN on your computer.
 
-If you do not wish to follow these steps, the NTP-ERSN/app/script directory is provided with a script NTP-ERSN_installer.sh to download the prerequisites automatically.
+If you do not wish to follow these steps, the [NTP-ERSN/app/script](https://github.com/mohamedlahdour/NTP-ERSN/tree/master/script) directory is provided with a script [NTP-ERSN_installer.sh](https://github.com/mohamedlahdour/NTP-ERSN/tree/master/script) to download the prerequisites automatically.
 
 Installing on Linux
 -------------------
@@ -50,7 +50,7 @@ Installing on Linux
         sudo apt-get update
         sudo apt-get install gfortran
 
-2. You need to install numpy (F2PY) and matplotlib library to run the package OpenNTP:
+2. You need to install numpy (F2PY) and matplotlib library ... to run the package OpenNTP:
 
         sudo apt-get install python-pip
         sudo apt-get install python-numpy
@@ -66,11 +66,11 @@ Installing on Linux
 
         sudo apt-get install python-tk 
 
-4. Install the OpenNTP package
+4. Install the **NTP-ERSN** package
 
         git clone  https://github.com/mohamedlahdour/NTP-ERSN.git
 
-5. Import the *NTP-ERSN* and run the package in the following way:
+5. Import the **NTP-ERSN** and run the package in the following way:
     
          cd NTP-ERSN
     
