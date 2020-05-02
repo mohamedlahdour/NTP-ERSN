@@ -1,4 +1,4 @@
-# Neutron Transport Package OpenNTP
+# Neutron Transport Package NTP-ERSN
 
 In this project we develop a package NTP-ERSN to solve a neutron transport equation.
 
@@ -15,10 +15,6 @@ Neutron Transport Package NTP-ERSN(Open Neutron Transport Package from the Radia
 The code, including the graphical user interface is developed and maintained by Mohamed LAHDOUR (PhD student) and Prof. Tarek EL BARDOUNI from University Abdelmalek Essaadi Tetouan Morocco .
 
 You could contact Mohamed Lahdour : mohamedlahdour@gmail.com or mlahdour@uae.ac.ma
-
-The package can be obtained by :
-
-     git clone  https://github.com/mohamedlahdour/NTP-ERSN.git
 
 The directory structure of NTP-ERSN
 =============
