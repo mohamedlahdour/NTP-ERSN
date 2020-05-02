@@ -656,8 +656,8 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,delta,phi,eps,tot
         write (100, FMT=* ) 'ERSN, UNIVERSITY ABDELMALEK ESSAADI FACULTY OF SCIENCES - TETOUAN, MOROCCO'
         write (100, FMT=* ) 'CODE  DEVELOPED  BY  MOHAMED  LAHDOUR,  PHD  STUDENT'
         write (100, FMT=* ) 'NTP-ERSN:        SN  DISCRETE  ORDINATES  METHOD'
-        write (100, FMT=* ) 'VERSION NUMBER:  1.1'
-        write (100, FMT=* ) 'VERSION DATE:    8  OTOBER  2018'
+        write (100, FMT=* ) 'VERSION NUMBER:  1.2'
+        write (100, FMT=* ) 'VERSION DATE:    2  MAI  2020'
         write (100,3010) 'RAN ON:          ', start,'(H:M:S)'
         write (100, FMT=* ) '********************************************************************************'
         write (100, FMT=* ) '           ----------------------------------------------------------' 
@@ -783,8 +783,8 @@ subroutine title1()
        '      ╚═╝  ╚═══╝   ╚═╝   ╚═╝           ╚══════╝&
        &╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝',& 
          '______________________________________________________________________________'
-       write(*,FMT=*) '                                                   Version Number: 1.1 '
-       write(*,FMT=*) '     Copyright:      2015-2018 FS-Tetouan University Abdelmalk Essaadi '
+       write(*,FMT=*) '                                                   Version Number: 1.2 '
+       write(*,FMT=*) '     Copyright:      2015-2020 FS-Tetouan University Abdelmalk Essaadi '
        write ( *, FMT=* ) '.'
        write ( *, FMT=* ) '   FORTRAN90 version'  
        write ( *, FMT=* ) '   The Discrete Ordinates Method Sn'   

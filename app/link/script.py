@@ -1,1 +1,0 @@
-/home/lahdour/correction/NTP-ERSN/app/input/input.json
