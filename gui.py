@@ -6,7 +6,7 @@ import time
 import sys
 import platform
 import Tkinter as tk
-import pygmyplot # pip install pygmyplot
+import pygmyplot 
 import ScrolledText
 from multiprocessing import Process  
 from threading import Thread
