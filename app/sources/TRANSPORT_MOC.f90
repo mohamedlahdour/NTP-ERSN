@@ -2,9 +2,9 @@
 subroutine gauleg(x1,x2,x,w,ngauss)
        implicit none
        integer(kind=4), intent(in) :: ngauss
-       real(kind=8), intent(in) :: x1,x2
-       real(kind=8), dimension(ngauss), intent(out) :: x,w
-       real(kind=8), parameter :: EPSS = 3.0E-14
+       real(kind=4), intent(in) :: x1,x2
+       real(kind=4), dimension(ngauss), intent(out) :: x,w
+       real(kind=4), parameter :: EPSS = 3.0E-7
        !EPS is the relative precision.
        !Given the lower and upper limits of integration x1 and x2 ,
        !and given n ,   1rthis routine returns
@@ -12,7 +12,7 @@ subroutine gauleg(x1,x2,x,w,ngauss)
        ! containing the abscissas and weights of the Gauss-
        !Legendre n-point quadrature formula.
        integer(kind=4) :: i,j,m
-       real(kind=8) :: p1,p2,p3,pp,xl,xm,z,z1
+       real(kind=4) :: p1,p2,p3,pp,xl,xm,z,z1
        m=(ngauss+1)/2
        xm=0.50*(x2+x1)
        xl=0.50*(x2-x1)
@@ -41,9 +41,9 @@ end subroutine gauleg
 subroutine leg_poly(ngauss,order,mu,p) 
        implicit none
        integer(kind=4), intent(in) :: ngauss,order
-       real(kind=8), dimension(ngauss), intent(in) :: mu
-       real(kind=8), dimension(order,ngauss), intent(out) :: p
-       real(kind=8) :: a1,a2
+       real(kind=4), dimension(ngauss), intent(in) :: mu
+       real(kind=4), dimension(order,ngauss), intent(out) :: p
+       real(kind=4) :: a1,a2
        integer(kind=4) :: l,k
        k = order
            if ( k == 1 ) then
@@ -61,45 +61,38 @@ subroutine leg_poly(ngauss,order,mu,p)
               enddo
            endif
 end subroutine leg_poly
-!BL3
-subroutine fmm_id(totNFM,nregion,nfmesh,RegMat,fmmid)
+!BLOC3
+    subroutine fmm_id(assembly,core,fmmid,nfmesh,width,RegMat,npx,npc,nx,nxx,na,totNFM,Delta)
        implicit none
-       integer(kind=4), intent(in) :: totNFM,nregion
-       integer(kind=4), dimension(nregion), intent(in) :: RegMat,nfmesh
-       integer(kind=4), dimension(totNFM), intent(out) :: fmmid 
-       integer(kind=4) :: m,i,j
-       !-- fine mesh material id       
-       m = 1
-       do i = 1,size(nfmesh)
-          do j=1,nfmesh(i)
-             fmmid(m) = RegMat(i)
-             m= m+1
+       integer(kind=4), intent(in) :: npx,npc,nx,nxx,na,totNFM
+       integer(kind=4), dimension(npc,npx), intent(in) :: RegMat, nfmesh
+       real(kind=4), dimension(npc,npx), intent(in) :: width
+       integer(kind=4), dimension(nx), intent(in) :: core
+       integer(kind=4), dimension(na,nxx), intent(in) :: assembly
+       integer(kind=4), dimension(totNFM), intent(out) :: fmmid
+       real(kind=4), dimension(totNFM), intent(out) :: Delta
+       ! Variables Locales
+       integer(kind=4) :: i,n1,n2,n3
+       i = 1
+       ! -- fine mesh material id 
+       do n1 = 1,nx
+          do n2 = 1,nxx
+             do n3 = 1,npx    
+                fmmid(i:i+nfmesh(assembly(core(n1),n2),n3)-1) = RegMat(assembly(core(n1),n2),n3)
+                Delta(i:i+nfmesh(assembly(core(n1),n2),n3)-1) = width(assembly(core(n1),n2),n3)/&
+                                                                nfmesh(assembly(core(n1),n2),n3)
+                i=i+nfmesh(assembly(core(n1),n2),n3)
+             enddo
           enddo
        enddo
-end subroutine fmm_id
-!BL4
-subroutine Delta_f(nregion,totNFM,nfmesh,dcell,Delta)
-       implicit none
-       integer(kind=4), intent(in) :: nregion,totNFM
-       integer(kind=4), dimension(nregion), intent(in) :: nfmesh
-       real(kind=8), dimension(nregion), intent(in) :: dcell
-       real(kind=8), dimension(totNFM), intent(out) :: Delta
-       integer(kind=4) :: i,j,m
-       m=1
-       do i = 1,size(nfmesh)
-          do j=1,nfmesh(i)
-             Delta(m) = dcell(i)/nfmesh(i)
-             m= m+1
-          enddo
-       enddo
-end subroutine Delta_f
+    end subroutine fmm_id
 !BL5
 subroutine Matrix_D(SigS,D,fmmid,ng,Nmat,order,totNFM,dim)
        implicit none
        integer(kind=4), intent(in) :: ng,Nmat,totNFM,dim,order
        integer(kind=4), dimension(totNFM), intent(in) :: fmmid
-       real(kind=8), dimension(Nmat,order,ng,ng), intent(in) :: SigS
-       real(kind=8), dimension(dim,dim,order), intent(out) :: D
+       real(kind=4), dimension(Nmat,order,ng,ng), intent(in) :: SigS
+       real(kind=4), dimension(dim,dim,order), intent(out) :: D
        integer(kind=4) :: k0,k,k1,i,j 
        D = 0.0
        do k1 = 1,order
@@ -119,8 +112,8 @@ subroutine Matrix_L(SigS,L,fmmid,ng,Nmat,order,totNFM,dim)
        implicit none
        integer(kind=4), intent(in) :: ng,Nmat,totNFM,dim,order
        integer(kind=4), dimension(totNFM), intent(in) :: fmmid
-       real(kind=8), dimension(Nmat,order,ng,ng), intent(in) :: SigS
-       real(kind=8), dimension(dim ,dim,order), intent(out) :: L
+       real(kind=4), dimension(Nmat,order,ng,ng), intent(in) :: SigS
+       real(kind=4), dimension(dim ,dim,order), intent(out) :: L
        integer(kind=4) :: i,k0,k1,k2,k3,k4
                 L(:,:,:) = 0.0
             do  k4  = 1,order
@@ -143,8 +136,8 @@ subroutine Matrix_U(SigS,U,fmmid,ng,Nmat,order,totNFM,dim)
        implicit none
        integer(kind=4), intent(in) :: ng,Nmat,totNFM,dim,order
        integer(kind=4), dimension(totNFM), intent(in) :: fmmid
-       real(kind=8), dimension(Nmat,order,ng,ng), intent(in) :: SigS
-       real(kind=8), dimension(dim,dim,order), intent(out) :: U
+       real(kind=4), dimension(Nmat,order,ng,ng), intent(in) :: SigS
+       real(kind=4), dimension(dim,dim,order), intent(out) :: U
        integer(kind=4) :: i,k0,k1,k2,k3,k4
                 U(:,:,:) = 0.0
             do  k4  = 1,order
@@ -167,8 +160,8 @@ subroutine Matrix_F(NusigF,Chi,F,fmmid,ng,Nmat,totNFM,dim)
        implicit none
        integer(kind=4), intent(in) :: ng,Nmat,totNFM,dim
        integer(kind=4), dimension(totNFM), intent(in) :: fmmid
-       real(kind=8), dimension(Nmat,ng), intent(in) :: NusigF,Chi
-       real(kind=8), dimension(dim ,dim), intent(out) :: F
+       real(kind=4), dimension(Nmat,ng), intent(in) :: NusigF,Chi
+       real(kind=4), dimension(dim ,dim), intent(out) :: F
        integer(kind=4) :: i,j,k0,k1,k2,k3,k
             F(:,:) = 0.0
             k0 = 1
@@ -196,21 +189,22 @@ subroutine Matrix_F(NusigF,Chi,F,fmmid,ng,Nmat,totNFM,dim)
             enddo
 end subroutine Matrix_F
 !BL9
-subroutine flux_guess(dim,ng,Nmat,nregion,ngauss,order,totNFM,NusigF,dcell,p,flux_ni,flux_li)
+subroutine flux_guess(dim,ng,Nmat,ngauss,order,totNFM,fmmid,NusigF,Delta,p,flux_ni,flux_li)
        implicit none
-       integer(kind=4), intent(in) :: dim, ng,Nmat,nregion,ngauss,order,totNFM
-       real(kind=8), dimension(Nmat,ng), intent(in) :: NusigF
-       real(kind=8), dimension(order,ngauss), intent(in) :: p
-       real(kind=8), dimension(totNFM), intent(in) :: dcell
-       real(kind=8), dimension(dim,ngauss*ng), intent(out) :: flux_ni
-       real(kind=8), dimension(dim,order), intent(out) :: flux_li
+       integer(kind=4), intent(in) :: dim,ng,Nmat,ngauss,order,totNFM
+       real(kind=4), dimension(Nmat,ng), intent(in) :: NusigF
+       real(kind=4), dimension(order,ngauss), intent(in) :: p
+       real(kind=4), dimension(totNFM), intent(in) :: Delta
+       integer(kind=4), dimension(totNFM), intent(in) :: fmmid
+       real(kind=4), dimension(dim,ngauss*ng), intent(out) :: flux_ni
+       real(kind=4), dimension(dim,order), intent(out) :: flux_li
        integer(kind=4) :: i,k1,n,ll,m,k0,k2
-       real(kind=8), dimension(ng*nregion) :: a10,a11
+       real(kind=4), dimension(ng*totNFM) :: a10,a11
        i = 1
        do k1=1,ng
-          do k2=1,nregion
-             a10(i) = NusigF(k2,k1)
-             a11(i) = dcell(k2)
+          do k2=1,totNFM
+             a10(i) = NusigF(fmmid(k2),k1)
+             a11(i) = Delta(k2)
              i = i + 1
           enddo
        enddo
@@ -237,12 +231,12 @@ end subroutine flux_guess
 subroutine Fission_Source(ng,dim,ngauss,order,totNFM,F,flux_li,p,k_eff,FQ_ni)
        implicit none
        integer(kind=4), intent(in) :: dim,ngauss,ng,totNFM,order
-       real(kind=8), intent(in) :: k_eff 
-       real(kind=8), dimension(dim ,dim), intent(in) :: F
-       real(kind=8), dimension(order,ngauss), intent(in) :: p
-       real(kind=8), dimension(dim,order), intent(in) :: flux_li
-       real(kind=8), dimension(dim,ngauss*ng), intent(out) :: FQ_ni
-       real(kind=8), dimension(dim,order) :: Q_li,phi_li
+       real(kind=4), intent(in) :: k_eff 
+       real(kind=4), dimension(dim ,dim), intent(in) :: F
+       real(kind=4), dimension(order,ngauss), intent(in) :: p
+       real(kind=4), dimension(dim,order), intent(in) :: flux_li
+       real(kind=4), dimension(dim,ngauss*ng), intent(out) :: FQ_ni
+       real(kind=4), dimension(dim,order) :: Q_li,phi_li
        integer(kind=4) :: i,k0,k1,k2,ll,n,m
        k0=1;k2=1
        phi_li = flux_li
@@ -273,11 +267,11 @@ end subroutine Fission_Source
 subroutine Scattering_Source(ng,dim,ngauss,order,totNFM,D,U,L,flux_li,p,SQ_ni)
        implicit none
        integer(kind=4), intent(in) :: dim,ngauss,ng,totNFM,order
-       real(kind=8), dimension(dim,dim,order), intent(in) :: L,U,D
-       real(kind=8), dimension(order,ngauss), intent(in) :: p
-       real(kind=8), dimension(dim,order), intent(in) :: flux_li
-       real(kind=8), dimension(dim,ngauss*ng), intent(out) :: SQ_ni
-       real(kind=8), dimension(dim,order) :: Q_li
+       real(kind=4), dimension(dim,dim,order), intent(in) :: L,U,D
+       real(kind=4), dimension(order,ngauss), intent(in) :: p
+       real(kind=4), dimension(dim,order), intent(in) :: flux_li
+       real(kind=4), dimension(dim,ngauss*ng), intent(out) :: SQ_ni
+       real(kind=4), dimension(dim,order) :: Q_li
        integer(kind=4) :: i,k0,k1,k2,ii,ll,n,m
        SQ_ni(:,:) = 0.0
 
@@ -307,8 +301,8 @@ end subroutine Scattering_Source
 subroutine Total_Source(ng,dim,ngauss,FQ_ni,SQ_ni,Q_ni)
        implicit none
        integer(kind=4), intent(in) :: dim,ngauss,ng
-       real(kind=8), dimension(dim,ngauss*ng), intent(in) :: FQ_ni,SQ_ni
-       real(kind=8), dimension(dim,ngauss*ng), intent(out) :: Q_ni
+       real(kind=4), dimension(dim,ngauss*ng), intent(in) :: FQ_ni,SQ_ni
+       real(kind=4), dimension(dim,ngauss*ng), intent(out) :: Q_ni
        
        Q_ni =  SQ_ni + FQ_ni
 end subroutine Total_Source
@@ -317,11 +311,11 @@ subroutine Matrix_AB(ng,Nmat,dim,totNFM,ngauss,mu,fmmid,SigT,Delta,Q_ni,A,B)
        implicit none
        integer(kind=4), intent(in) :: ng,Nmat,dim,totNFM,ngauss
        integer(kind=4), dimension(totNFM), intent(in) :: fmmid
-       real(kind=8), dimension(totNFM), intent(in) :: Delta
-       real(kind=8), dimension(ngauss), intent(in) :: mu
-       real(kind=8), dimension(Nmat,ng), intent(in) :: SigT
-       real(kind=8), dimension(dim,ngauss*ng), intent(in) :: Q_ni
-       real(kind=8), dimension(dim,ngauss*ng), intent(out) :: A,B
+       real(kind=4), dimension(totNFM), intent(in) :: Delta
+       real(kind=4), dimension(ngauss), intent(in) :: mu
+       real(kind=4), dimension(Nmat,ng), intent(in) :: SigT
+       real(kind=4), dimension(dim,ngauss*ng), intent(in) :: Q_ni
+       real(kind=4), dimension(dim,ngauss*ng), intent(out) :: A,B
        integer(kind=4) :: i,n,k0,k1,k2,j
        k0=1;k2=1
      
@@ -354,10 +348,10 @@ subroutine current_f(BC,scheme,A,B,ng,ngauss,totNFM,dim,curr)
        implicit none
        CHARACTER(50), intent(in) :: BC, scheme
        integer(kind=4), intent(in) :: ng,ngauss,totNFM,dim
-       real(kind=8), dimension(dim,ngauss*ng), intent(in) :: A,B
-       real(kind=8), dimension((totNFM+1)*ng,ngauss*ng), intent(out) :: curr
-       real(kind=8), dimension((totNFM+1)*ng,ngauss*ng) ::curra,currb
-       real(kind=8) :: al
+       real(kind=4), dimension(dim,ngauss*ng), intent(in) :: A,B
+       real(kind=4), dimension((totNFM+1)*ng,ngauss*ng), intent(out) :: curr
+       real(kind=4), dimension((totNFM+1)*ng,ngauss*ng) ::curra,currb
+       real(kind=4) :: al
        integer(kind=4) :: i,j,k1,k0,k2,m,n
        curr = 0.0
        k0=1;k2=1;n = 1
@@ -557,9 +551,9 @@ end subroutine current_f
 subroutine flux_moy(A,B,ng,ngauss,totNFM,dim,curr,flux_ni)
        implicit none
        integer(kind=4), intent(in) :: ng,ngauss,totNFM,dim
-       real(kind=8), dimension(dim,ngauss*ng), intent(in) :: A,B
-       real(kind=8), dimension((totNFM+1)*ng,ngauss*ng), intent(in) :: curr
-       real(kind=8), dimension(dim,ngauss*ng), intent(out) :: flux_ni
+       real(kind=4), dimension(dim,ngauss*ng), intent(in) :: A,B
+       real(kind=4), dimension((totNFM+1)*ng,ngauss*ng), intent(in) :: curr
+       real(kind=4), dimension(dim,ngauss*ng), intent(out) :: flux_ni
        integer(kind=4) :: i,j,k1,k0,k2,m,n,l       
                         flux_ni = 0.0
                         k0 = 1
@@ -591,25 +585,25 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
        implicit none
        integer(kind=4), intent(in) :: ng,dim,totNFM,ngauss,order,Nmat,Max_it
        integer(kind=4), dimension(totNFM), intent(in) :: fmmid 
-       real(kind=8), dimension(ngauss), intent(in) :: wt,mu
-       real(kind=8), dimension(totNFM), intent(in) :: Delta
-       real(kind=8), dimension(dim ,dim), intent(in) :: F
-       real(kind=8), dimension(order,ngauss), intent(in) :: p
-       real(kind=8), dimension(Nmat,ng), intent(in) :: SigT
-       real(kind=8), dimension(dim,dim,order), intent(in) :: D,U,L
-       real(kind=8), intent(in) :: eps
-       real(kind=8), dimension(dim,ngauss*ng), intent(inout) :: flux_ni
-       real(kind=8), dimension(dim,order), intent(inout) :: flux_li
-       real(kind=8), dimension(dim), intent(out) :: phi
-       real(kind=8), intent(out) :: k_eff
+       real(kind=4), dimension(ngauss), intent(in) :: wt,mu
+       real(kind=4), dimension(totNFM), intent(in) :: Delta
+       real(kind=4), dimension(dim ,dim), intent(in) :: F
+       real(kind=4), dimension(order,ngauss), intent(in) :: p
+       real(kind=4), dimension(Nmat,ng), intent(in) :: SigT
+       real(kind=4), dimension(dim,dim,order), intent(in) :: D,U,L
+       real(kind=4), intent(in) :: eps
+       real(kind=4), dimension(dim,ngauss*ng), intent(inout) :: flux_ni
+       real(kind=4), dimension(dim,order), intent(inout) :: flux_li
+       real(kind=4), dimension(dim), intent(out) :: phi
+       real(kind=4), intent(out) :: k_eff
        integer(kind=4), intent(out) :: it,inter
 !      variables locale
-       real(kind=8), dimension(dim,ngauss*ng) :: A,B
-       real(kind=8), dimension(dim,ngauss*ng) :: Q_ni,SQ_ni,flux0,flux00,flux,FQ_ni
-       real(kind=8), dimension((totNFM+1)*ng,ngauss*ng) :: curr
-       real(kind=8), dimension(dim,order) :: flux_li0
-       real(kind=8), dimension(ng) :: moy 
-       real(kind=8) :: err_k_eff, err_phi, k_eff0, eval1, eval2,Del,Sig,muu,err_flux
+       real(kind=4), dimension(dim,ngauss*ng) :: A,B
+       real(kind=4), dimension(dim,ngauss*ng) :: Q_ni,SQ_ni,flux0,flux00,flux,FQ_ni
+       real(kind=4), dimension((totNFM+1)*ng,ngauss*ng) :: curr
+       real(kind=4), dimension(dim,order) :: flux_li0
+       real(kind=4), dimension(ng) :: moy 
+       real(kind=4) :: err_k_eff, err_phi, k_eff0, eval1, eval2,Del,Sig,muu,err_flux
        integer(kind=4) :: i,n,k0,k2,k1
        CHARACTER(50), intent(in) :: BC, scheme
 !      convergence parameters
@@ -679,6 +673,16 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
              enddo
 ! ending intern Iteration 
 !==============================================================================
+             err_phi =  maxval(abs(abs(flux_ni)-flux00)/flux00)
+             it = it + 1     
+             eval1=sum(matmul(F, flux_li(:,1)))
+             eval2=sum(matmul(F, flux_li0(:,1)))
+             k_eff = k_eff*(eval1/eval2)
+             err_k_eff =  abs(k_eff-k_eff0)/k_eff
+             write(*,2000)it,k_eff,err_k_eff  
+             flux_li0 = flux_li
+             flux00   = abs(flux_ni)
+       end do  
              phi = 0.0
                  k0 = 1
                  k2 = 1
@@ -698,41 +702,20 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
                        k2 = k2 + ngauss
                  enddo
 
-             err_phi =  maxval(abs(abs(flux_ni)-flux00)/flux00)
-             it = it + 1     
-             eval1=sum(matmul(F, flux_li(:,1)))
-             eval2=sum(matmul(F, flux_li0(:,1)))
-             k_eff = k_eff*(eval1/eval2)
-             err_k_eff =  abs(k_eff-k_eff0)/k_eff
-             write(*,2000)it,k_eff,err_k_eff  
-             flux_li0 = flux_li
-             flux00   = abs(flux_ni)
-       end do  
-       moy = 0.0
-       k1 = 1
-       do k0 = 1,ng
-          do i=k1,totNFM*k0
-             moy(k0) = moy(k0) + phi(i)
-          end do
-          do i=k1,totNFM*k0
-             phi(i) = phi(i)/(moy(k0)/totNFM)
-          end do
-          k1 = k1 + totNFM 
-       enddo
        2000 format(t3,"Iteration",i4,":",5x,"===>",5x,"keff =",F9.6,5x,"===>",5x,"res =",e10.3)
 end subroutine Outer_Iteration
 !BL17
-subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,totNFM,dim,&
-                  ng,Nmat,order,nregion,ngauss,it1,it2)
+subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,delta,phi,eps,totNFM,dim,&
+                  ng,Nmat,order,ngauss,it1,it2)
         implicit none
-        integer(kind=4), intent(in) :: ng,dim,totNFM,Nmat,order,nregion,ngauss,it1,it2
-        real(kind=8), dimension(Nmat,ng), intent(in) :: SigT,NusigF,Chi
-        real(kind=8), dimension(Nmat,order,ng,ng), intent(in) :: SigS
-        real(kind=8), dimension(dim), intent(in) :: phi
-        real(kind=8), dimension(nregion), intent(in) :: dcell
-        real(kind=8), dimension(ngauss), intent(in) :: mu,wt
+        integer(kind=4), intent(in) :: ng,dim,totNFM,Nmat,order,ngauss,it1,it2
+        real(kind=4), dimension(Nmat,ng), intent(in) :: SigT,NusigF,Chi
+        real(kind=4), dimension(Nmat,order,ng,ng), intent(in) :: SigS
+        real(kind=4), dimension(dim), intent(in) :: phi
+        real(kind=4), dimension(totNFM), intent(in) :: delta
+        real(kind=4), dimension(ngauss), intent(in) :: mu,wt
         CHARACTER(50), intent(in) :: start,BC,tm
-        real(kind=8), intent(in) :: eps,k_eff
+        real(kind=4), intent(in) :: eps,k_eff
         integer(kind=4) :: i,j
         open (100,file='app/Output/OUTPUT_MOC.TXT')
         write (100, FMT=* ) '********************************************************************************'
@@ -748,9 +731,9 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,tot
         write (100, FMT=* ) '           ----------------------------------------------------------'
         write (100, FMT=* ) ''
         write (100, FMT=* ) 'ENERGY GROUP NUMBER:                   ',ng
-        write (100, FMT=* ) 'REGIONS NUMBER:                        ',nregion
+        !write (100, FMT=* ) 'REGIONS NUMBER:                        ',nregion
         write (100, FMT=* ) 'MATERIALS NUMBER:                      ',Nmat
-        write (100,3040)    'SIZE FOR EACH MATERIAL PER [CM]:       ',dcell       
+        write (100,3040)    'SIZE FOR EACH MATERIAL PER [CM]:       ',delta  
         write (100, FMT=* ) 'DISCRETIZATIONS ANGULAR:               ',ngauss
         write (100, FMT=* ) 'ORDER LEGENDRE POLONOMIAL:             ',order-1
         write (100, FMT=* ) 'TOTAL NUMBER OF FINE MESHES:           ',totNFM
@@ -822,21 +805,38 @@ subroutine Output(start,BC,tm,k_eff,SigT,NusigF,SigS,Chi,mu,wt,dcell,phi,eps,tot
         close(100)
 end subroutine Output
 !BL18
-subroutine plot_flux(Delta,flux,totNFM,dim)
+subroutine plot_flux(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na,Delta,assembly,nfmesh,flux,fmmid,core,sigF)
         implicit none
-        integer(kind=4), intent(in) :: dim,totNFM
-        real(kind=8), dimension(dim), intent(in) :: flux
-        real(kind=8), dimension(totNFM), intent(in) :: Delta
-        real(kind=8) :: som
-        integer(kind=4) :: i,j
-        open (10,file='app/Output/flux_moc.h')
+        integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na
+        real(kind=4), dimension(Nmat,ng), intent(in) :: sigF
+        integer(kind=4), dimension(totNFM), intent(in) :: fmmid
+        integer(kind=4), dimension(npc,npx), intent(in) ::  nfmesh
+        real(kind=4), dimension(totNFM), intent(in) :: delta
+        integer(kind=4), dimension(na,nxx), intent(in) :: assembly
+        integer(kind=4), dimension(nx), intent(in) :: core
+        real(kind=4), dimension(dim), intent(in) :: flux
+        real(kind=4), dimension(nx*nxx) :: PF
+        real(kind=4) :: som,val
+        integer(kind=4) :: i,j,k,n
+        open (10,file='app/Output/FLUX_MOC.H')
+        open (11,file='app/Output/PF_MOC.H')
+        call PowerPF(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na,Delta,assembly,nfmesh,flux,core,fmmid,sigF,PF)
+        n=1;val=0.
+        write(11,*) val
+        do i = 1,nx
+             do k=1,nxx
+                write(11,*) PF(n)
+                n=n+1  
+             enddo
+        enddo
+
         som = Delta(1)
         do i=1,totNFM
-        write(10,*) som,(flux(i+j),j=0,dim-1,totNFM) !/flux(1+j)
+        write(10,*) som,(flux(i+j),j=0,dim-1,totNFM)
         som = som + Delta(i)
         enddo
         close(10)
-        !2000 format(1x,100p6e12.4)
+        close(11)
 end subroutine plot_flux
 !BL19
 subroutine title1()       
@@ -932,4 +932,122 @@ subroutine timestamp()
        d, trim ( month(m) ), y, h, ':', n, ':', s, '.', mm, trim ( ampm )
        return
 end subroutine timestamp
+!BLOC16
+    subroutine PowerPF(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na,Delta,assembly,nfmesh,phi,core,fmmid,sigF,PF)
+    ! CALCULATION OF POWER PEAKING FACTOR
+       implicit none
+       integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na
+       real(kind=4), dimension(Nmat,ng), intent(in) :: sigF
+       integer(kind=4), dimension(totNFM), intent(in) :: fmmid
+       integer(kind=4), dimension(npc,npx), intent(in) ::  nfmesh
+       real(kind=4), dimension(totNFM), intent(in) :: delta
+       integer(kind=4), dimension(na,nxx), intent(in) :: assembly
+       real(kind=4), dimension(dim), intent(in) :: phi
+       integer(kind=4), dimension(nx), intent(in) :: core
+       real(kind=4), dimension(nx*nxx), intent(out) :: PF
+       real(kind=4), dimension(totNFM,ng) :: flux
+       real(kind=4), dimension(nx*nxx) :: PF0
+       real(kind=4) :: pm
+       integer(kind=4) :: i,j,k,l,n,n1
+       n=1
+       do i=1,ng
+          do j=1,totNFM
+             flux(j,i)=phi(n)
+             n=n+1
+          enddo
+       enddo
+       PF0 = 0.0; PF = 0.0
+       n=1;n1=1
+       do i=1,nx
+             do k =1,nxx
+                do l=1,sum(nfmesh(assembly(core(i),k),:))
+                   PF0(n) = PF0(n) + delta(n1)*sum(sigF(fmmid(n1),:)*flux(n1,:))
+                   n1=n1+1
+                enddo
+              n=n+1
+             enddo
+       enddo
+       PF0 = PF0/sum(delta)
+       pm  = sum(PF0)/float(napc)
+       PF  = PF0/pm
+    end subroutine PowerPF
+    subroutine ScalarFluxPinC(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,na,nfmesh,delta,assembly,phi,core,SFPC)
+    ! CALCULATION OF SCALAR FLUX IN EACH PIN CELL
+       integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng,nx,nxx,npx,npc,na
+       integer(kind=4), dimension(npc,npx), intent(in) ::  nfmesh
+       real(kind=4), dimension(totNFM), intent(in) :: delta
+       integer(kind=4), dimension(na,nxx), intent(in) :: assembly
+       real(kind=4), dimension(dim), intent(in) :: phi
+       integer(kind=4), dimension(nx), intent(in) :: core
+       real(kind=4), dimension(nx*nxx,ng), intent(out) :: SFPC
+       real(kind=4), dimension(totNFM,ng) :: flux
+       integer(kind=4) :: i,j,k,l,n,n1
+       real(kind=4) :: som
+       open (10,file='app/Output/SFPC.H')
+       n=1
+       do i=1,ng
+          do j=1,totNFM
+             flux(j,i)=phi(n)
+             n=n+1
+          enddo
+       enddo
+
+       n=1;n1=1
+       do i=1,nx
+             do k =1,nxx  
+                do l=1,sum(nfmesh(assembly(core(i),k),:))
+                   SFPC(n,:) = SFPC(n,:) + delta(n1)*flux(n1,:)
+                   n1=n1+1
+                enddo
+              n=n+1
+             enddo
+       enddo
+       SFPC = SFPC/sum(delta)
+       do i=1,nx*nxx
+          write(10,*) (SFPC(i,j),j=1,ng)
+       enddo
+       close(10)
+    end subroutine ScalarFluxPinC
+
+!BLOC15
+    subroutine NormalizeFlux(dim,totNFM,Nmat,ng,NusigF,Chi,fmmid,delta,phi) 
+    implicit none
+    ! Neutron scalar flux is normalized according to sum(V*Chi*NusigF*phi=1)
+    integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng
+    real(kind=4), dimension(Nmat,ng), intent(in) :: NusigF,Chi
+    real(kind=4), dimension(totNFM), intent(in) :: delta
+    integer(kind=4), dimension(totNFM), intent(in) :: fmmid
+    real(kind=4), dimension(dim), intent(inout) :: phi
+    real(kind=4), dimension(totNFM,ng) :: flux
+    integer(kind=4) :: i,j,k,n
+    real(kind=4) :: norme,a1,a2,a3
+    ! Initialize local variables
+    n=1
+       do i=1,ng
+          do j=1,totNFM
+             flux(j,i)=phi(n)
+             n=n+1
+          enddo
+       enddo
+    norme = 0.0
+    ! Normalized source
+    do k=1,ng      
+          do i = 1,totNFM
+             a1 = Chi(fmmid(i),k)*sum(NusigF(fmmid(i),:)*flux(i,:))   
+             a2 = delta(i)*delta(i)
+             a3 = a1*a1
+             norme = norme  + sqrt(a2*a3)
+          enddo
+    enddo
+    flux = sum(delta)*flux/norme
+    n=1
+       do i=1,ng
+          do j=1,totNFM
+             phi(n) = flux(j,i)
+             n=n+1
+          enddo
+       enddo
+    end subroutine NormalizeFlux
+
+
 

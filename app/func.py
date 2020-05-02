@@ -7,96 +7,178 @@ import subprocess
 import tkFileDialog
 import tkMessageBox
 import shutil
+import ttk
 from Tkinter import *
 import matplotlib.pyplot as plt
+import numpy 
 import numpy as np
 import json
 import matplotlib.patches as mpatch
+import matplotlib.patches as mpatches
+import matplotlib.mlab as mlab
 #from playsound import 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 def new1(self):
-        self.nregion  = int(self.ent0[1].get())
-        self.nmat     = int(self.ent0[2].get())
-        self.tab1 = [0]*self.nregion   
-        if  self.nregion == 0:
-            tkMessageBox.showwarning("Warning", "Enter the Total Number of Regions")
-        elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of materials")
-        elif self.nmat > self.nregion:
-            tkMessageBox.showwarning("Warning", "the number of materials must not exceed the number of regions")
-        else:
+    self.nmat = int(self.ent0[1].get())
+    self.np   = int(self.ent0[2].get())
+    self.nx   = int(self.ent0[3].get())
+    self.nxa  = int(self.ent0[4].get())
+    self.na   = int(self.ent0[5].get())
+
+    M00 = open('app/link/script01.py', "r" ).read() 
+    if M00 == 'Pin Cell':
+        if  self.nmat == 0:
+            tkMessageBox.showwarning("Warning", "Enter Enter the materials number")
+        elif self.np == 0:
+            tkMessageBox.showwarning("Warning", "Enter the pin cells number")
+        elif self.nx == 0:
+            tkMessageBox.showwarning("Warning", "Enter the x mesh pin cell number \n"+
+                                     "(Each pin cell is approximated by a x cartesian grid)")
+        elif self.np != 0 and self.nx != 0 and self.nmat != 0:
+
             self.newWindow = Toplevel()
             self.newWindow.grab_set()
             self.newWindow.focus_set()
             self.newWindow.columnconfigure(0, weight=1)
             self.newWindow.rowconfigure(3, weight=1)
             self.newWindow.resizable(True,True)
-            if  self.nregion <= 4:
-                self.newWindow.geometry("432x238+550+250")
             self.newWindow.title("Parameters input")
-            Frame01 = LabelFrame(self.newWindow, text="Size for each Region per [cm]",
-                                 font=("Helvetica", 10), fg='blue',bg=self.boutton)
-            Frame01.grid(row=0,column=0,sticky=NSEW)
-            if len(self.tab1) > len(self.Delta):
-                self.Delta = [0]*self.nregion
-            self.lab2 = [0]*100
-            self.ent2 = [0]*100
-            self.lab2[0] = Label(Frame01, width=10, text="Size" ,anchor='w',bg=self.boutton)
-            self.lab2[0].grid(row=1, column=0,sticky=NSEW)
-            for i in range(self.nregion):
-                self.lab2[i+1] = Label(Frame01, width=10, text="Region %s" %(i+1),anchor='w',bg=self.boutton)
-                self.lab2[i+1].grid(row=0, column=i+1,sticky=NSEW)
-                self.ent2[i+1] = Entry(Frame01, width=10)
-                self.ent2[i+1].grid(row=1, column=i+1,sticky=NSEW)
-                self.ent2[i+1].delete(0,'end')
-                self.ent2[i+1].insert(0,self.Delta[i])
+            tabControl = ttk.Notebook(self.newWindow) 
+            tab = [0]*self.np
+            labelframe = [0]*self.np
+            self.lab1 = [0]*self.nx*self.np
+            self.ent1 = [0]*self.nx*self.np
+            self.lab2 = [0]*self.nx*self.np
+            self.ent2 = [0]*self.nx*self.np
+            self.lab3 = [0]*self.nx*self.np
+            self.ent3 = [0]*self.nx*self.np
+            self.Delta = [0]*self.nx*self.np
+            self.NFMR = [0]*self.nx*self.np
+            self.REGMAT = [0]*self.nx*self.np
+            m1=0;m2=0;m3=0
+            for i in range(self.np):
+                tab[i] = ttk.Frame(tabControl) 
+                tabControl.add(tab[i], text ="Pin Cell %s" %(i+1)) 
+                tabControl.pack(expand = 1, fill ="both") 
+                labelframe[i] = LabelFrame(tab[i], text="Size for each region per [cm]",fg='blue')  
+                labelframe[i].pack(fill="both", expand="yes")  
+                for j in range(self.nx):
+                    self.lab1[j] = Label(labelframe[i], text="X %s" %(j+1),anchor="center")
+                    self.lab1[j].grid(row=0, column=j+1,sticky=NSEW)
+                    self.ent1[m1] = Entry(labelframe[i], width=10)
+                    self.ent1[m1].grid(row=1, column=j+1,sticky=NSEW)
+                    self.ent1[m1].delete(0,'end') 
+                    self.ent1[m1].insert(0,self.Delta[m1])
+                    m1+=1
 
-            Frame02 = LabelFrame(self.newWindow, text="Number of fine meshes per Region",
-                                 font=("Helvetica", 10), fg='blue',bg=self.boutton)
-            Frame02.grid(row=1,column=0,sticky=NSEW)
-            if len(self.tab1) > len(self.NFMR):
-                self.NFMR = [0]*self.nregion
-            self.lab3 = [0]*100
-            self.ent3 = [0]*100
-            self.lab3[0] = Label(Frame02, width=10, text="NFMR" ,anchor='w',bg=self.boutton)
-            self.lab3[0].grid(row=1, column=0,sticky=NSEW)
-            for i in range(self.nregion):
-                self.lab3[i+1] = Label(Frame02, width=10, text="Region %s" %(i+1),anchor='w',bg=self.boutton)
-                self.lab3[i+1].grid(row=0, column=i+1,sticky=NSEW)
-                self.ent3[i+1] = Entry(Frame02, width=10)
-                self.ent3[i+1].grid(row=1, column=i+1,sticky=NSEW)
-                self.ent3[i+1].delete(0,'end')
-                self.ent3[i+1].insert(0,self.NFMR[i])
+                labelframe[i] = LabelFrame(tab[i], text="Which material fills each region",fg='blue')  
+                labelframe[i].pack(fill="both", expand="yes") 
 
-            Frame03 = LabelFrame(self.newWindow, text="Which material fills each region",
-                                 font=("Helvetica", 10), fg='blue',bg=self.boutton)
-            Frame03.grid(row=2,column=0,sticky=NSEW)
-            if len(self.tab1) > len(self.REGMAT):
-                self.REGMAT = [0]*self.nregion
+                for j in range(self.nx):
+                    self.lab2[j] = Label(labelframe[i], text="X %s" %(j+1),anchor="center")
+                    self.lab2[j].grid(row=0, column=j+1,sticky=NSEW)
+                    self.ent2[m2] = Entry(labelframe[i], width=10)
+                    self.ent2[m2].grid(row=1, column=j+1,sticky=NSEW)
+                    self.ent2[m2].delete(0,'end') 
+                    self.ent2[m2].insert(0,self.REGMAT[m2])
+                    m2+=1
+
+                labelframe[i] = LabelFrame(tab[i], text="Number of fine meshes per region",fg='blue')  
+                labelframe[i].pack(fill="both", expand="yes") 
+
+                for j in range(self.nx):
+                    self.lab3[j] = Label(labelframe[i], text="X %s" %(j+1),anchor="center")
+                    self.lab3[j].grid(row=0, column=j+1,sticky=NSEW)
+                    self.ent3[m3] = Entry(labelframe[i], width=10)
+                    self.ent3[m3].grid(row=1, column=j+1,sticky=NSEW)
+                    self.ent3[m3].delete(0,'end') 
+                    self.ent3[m3].insert(0,self.NFMR[m3])
+                    m3+=1
+            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save1)
+            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton.pack(fill="x", expand="yes")
+ 
+    elif M00 == 'Assembly':
+        if  self.na  == 0:
+            tkMessageBox.showwarning("Warning", "Enter the assemblies number")
+        elif  self.nxa  == 0:
+            tkMessageBox.showwarning("Warning", "Enter the x mesh assembly number \n"+
+                                       "(Each assembly contains a set of pin cells)")
+        elif self.na != 0 and self.nxa !=0:
+            self.newWindow = Toplevel()
+            self.newWindow.grab_set()
+            self.newWindow.focus_set()
+            self.newWindow.columnconfigure(0, weight=1)
+            self.newWindow.rowconfigure(3, weight=1)
+            self.newWindow.resizable(True,True)
+            self.newWindow.title("Parameters input")
+            tabControl = ttk.Notebook(self.newWindow) 
+            tab = [0]*self.na
+            labelframe = [0]*self.na
             self.lab4 = [0]*100
             self.ent4 = [0]*100
-            self.lab4[0] = Label(Frame03, width=10, text="Materials" ,anchor='w',bg=self.boutton)
-            self.lab4[0].grid(row=1, column=0,sticky=NSEW)
-            for i in range(self.nregion):
-                self.lab4[i+1] = Label(Frame03, width=10, text="Region %s" %(i+1),anchor='w',bg=self.boutton)
-                self.lab4[i+1].grid(row=0, column=i+1,sticky=NSEW)
-                self.ent4[i+1] = Entry(Frame03, width=10)
-                self.ent4[i+1].grid(row=1, column=i+1,sticky=NSEW)
-                self.ent4[i+1].delete(0,'end')
-                self.ent4[i+1].insert(0,self.REGMAT[i])
+            self.assm  = [0]*self.nxa*self.na
+            m=0
+            for i in range(self.na):
+                tab[i] = ttk.Frame(tabControl) 
+                tabControl.add(tab[i], text ="Assembly %s" %(i+1)) 
+                tabControl.pack(expand = 1, fill ="both")
 
-            Frame04 = LabelFrame(self.newWindow,font=("Helvetica", 10), fg='blue',bg=self.boutton)
-            Frame04.grid(row=3,column=0,sticky=NSEW)
-            self.bouton = Button(Frame04,text="Save", font='Times',command=self.save1)
+                labelframe[i] = LabelFrame(tab[i], text="Which pin cells fill the assembly lattice",fg='blue')  
+                labelframe[i].pack(fill="both", expand="yes") 
+
+                for j in range(self.nxa):
+                    self.lab4[m] = Label(labelframe[i], text="%s" %(j+1),anchor="center")
+                    self.lab4[m].grid(row=0, column=j+1,sticky=NSEW)
+                    self.ent4[m] = Entry(labelframe[i], width=10)
+                    self.ent4[m].grid(row=1, column=j+1,sticky=NSEW)
+                    self.ent4[m].delete(0,'end') 
+                    self.ent4[m].insert(0,self.assm[m])
+                    m+=1
+
+            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save2)
             self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
-            self.bouton.grid(row =0, column =0,columnspan=1,sticky=NSEW)
+            self.bouton.pack(fill="x", expand="yes") 
+    elif M00 == 'Core':
+        if self.na == 0:
+            tkMessageBox.showwarning("Warning", "Enter the assemblies number")
+        elif self.na != 0:
+            self.newWindow = Toplevel()
+            self.newWindow.grab_set()
+            self.newWindow.focus_set()
+            self.newWindow.columnconfigure(0, weight=1)
+            self.newWindow.rowconfigure(3, weight=1)
+            self.newWindow.resizable(True,True)
+            self.newWindow.title("Parameters input")
+            self.lab5 = [0]*100
+            self.ent5 = [0]*100
+            self.core = [0]*self.na
+            
+            labelframe = LabelFrame(self.newWindow, text="Which ssembly lattices fill the core geometry",fg='blue')  
+            labelframe.pack(fill="both", expand="yes") 
+
+            for j in range(self.na):
+                self.lab5[j] = Label(labelframe, text="%s" %(j+1),anchor="center")
+                self.lab5[j].grid(row=0, column=j+1,sticky=NSEW)
+                self.ent5[j] = Entry(labelframe, width=10)
+                self.ent5[j].grid(row=1, column=j+1,sticky=NSEW)
+                self.ent5[j].delete(0,'end') 
+                self.ent5[j].insert(0,self.core[j])
+
+            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save3)
+            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton.pack(fill="x", expand="yes") 
+
+  
             
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 def new2(self):
-        self.ngroup = int(self.ent0[0].get())
-        self.nmat   = int(self.ent0[2].get())
-        self.tab2  = [[0]*self.ngroup]*self.nmat
-        if  self.ngroup == 0:
+    self.ng    = int(self.ent0[0].get())
+    self.nmat  = int(self.ent0[1].get())
+    self.order = int(self.ent0[8].get())+1
+    M00 = open('app/link/script02.py', "r" ).read() 
+    if M00 == 'TotalXS':
+        if  self.ng == 0:
             tkMessageBox.showwarning("Warning", "Enter the number of energy group")
         elif self.nmat == 0:
             tkMessageBox.showwarning("Warning", "Enter the number of materials")
@@ -107,87 +189,31 @@ def new2(self):
             self.newWindow.columnconfigure(0, weight=1)
             self.newWindow.rowconfigure(0, weight=1)
             self.newWindow.resizable(True,True)
-            if  self.nmat <= 3:
-                if  self.ngroup <= 4:
-                    self.newWindow.geometry("432x180+550+250")
             self.newWindow.title("Parameters input")
-            Frame01 = LabelFrame(self.newWindow, text="Total Cross Section (SigT)",
-                                 font=("Helvetica", 10), fg='blue',bg=self.boutton)
-            Frame01.grid(columnspan=self.ngroup+1,rowspan=self.nmat+1,sticky=NSEW)
-            if np.size(self.tab2) > np.size(self.SigT): 
-                self.Vect1  = [0]*self.ngroup*self.nmat
-
-            self.lab5 = [0]*self.ngroup*self.nmat
-            self.ent5 = [0]*self.ngroup*self.nmat
+            labelframe = LabelFrame(self.newWindow, text="Total Cross Section (SigT)",fg='blue')  
+            labelframe.pack(fill="both", expand="yes") 
+            self.SigT = [0]*self.ng*self.nmat
+            self.lab6 = [0]*self.ng*self.nmat
+            self.ent6 = [0]*self.ng*self.nmat
             m = 0
             for j in range(self.nmat):
-                self.lab5[j] = Label(Frame01, width=10, text="Material %s" %(j+1),anchor='w',bg=self.boutton)
-                self.lab5[j].grid(row=j+1, column=0,sticky=NSEW)
-                for i in range(self.ngroup):
-                    self.lab5[i] = Label(Frame01, width=10, text="G %s" %(i+1),anchor='w',bg=self.boutton)
-                    self.lab5[i].grid(row=0, column=i+1,sticky=NSEW)
-                    self.ent5[m] = Entry(Frame01, width=10)
-                    self.ent5[m].grid(row=j+1, column=i+1,sticky=NSEW)
-                    self.ent5[m].delete(0,'end')
-                    self.ent5[m].insert(0,self.Vect1[m])
-                    m=m+1
-            
-            self.bouton = Button(Frame01,text="Save", font='Times',command=self.save2)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
-            self.bouton.grid(row =j+2, column =0,columnspan=1,pady = 20 ,sticky=NSEW)
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-def new3(self):
-        self.ngroup = int(self.ent0[0].get())
-        self.nmat   = int(self.ent0[2].get())
-        self.tab3  = [[0]*self.ngroup]*self.nmat
-        if  self.ngroup == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy groups")
-        elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of materials")
-        else:
-            self.newWindow = Toplevel()
-            self.newWindow.grab_set()
-            self.newWindow.focus_set()
-            self.newWindow.columnconfigure(0, weight=1)
-            self.newWindow.rowconfigure(0, weight=1)
-            self.newWindow.resizable(True,True)
-            if  self.nmat <= 3:
-                if  self.ngroup <= 4:
-                    self.newWindow.geometry("432x180+550+250")
-            self.newWindow.title("Parameters input")
-            Frame01 = LabelFrame(self.newWindow, text="NuFission Cross Section (NuSigF)", 
-                                 font=("Helvetica", 10),fg='blue',bg=self.boutton)
-            Frame01.grid(columnspan=self.ngroup+1,rowspan=self.nmat+1,sticky=NSEW)
-            if np.size(self.tab3) > np.size(self.NuSigF): 
-                self.Vect2  = [0]*self.ngroup*self.nmat
-
-            self.lab6 = [0]*self.ngroup*self.nmat
-            self.ent6 = [0]*self.ngroup*self.nmat
-            m = 0
-            for j in range(self.nmat):
-                self.lab6[j] = Label(Frame01, width=10, text="Material %s" %(j+1),anchor='w',bg=self.boutton)
+                self.lab6[j] = Label(labelframe, width=10, text="Material %s" %(j+1),anchor='center')
                 self.lab6[j].grid(row=j+1, column=0,sticky=NSEW)
-                for i in range(self.ngroup):
-                    self.lab6[i] = Label(Frame01, width=10, text="G %s" %(i+1),anchor='w',bg=self.boutton)
+                for i in range(self.ng):
+                    self.lab6[i] = Label(labelframe, width=10, text="G %s" %(i+1),anchor='center')
                     self.lab6[i].grid(row=0, column=i+1,sticky=NSEW)
-                    self.ent6[m] = Entry(Frame01, width=10)
+                    self.ent6[m] = Entry(labelframe, width=10)
                     self.ent6[m].grid(row=j+1, column=i+1,sticky=NSEW)
                     self.ent6[m].delete(0,'end')
-                    self.ent6[m].insert(0,self.Vect2[m])
+                    self.ent6[m].insert(0,self.SigT[m])
                     m+=1
- 
-            self.bouton = Button(Frame01,text="Save", font='Times',command=self.save3)
+            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save4)
             self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
-            self.bouton.grid(row =j+2, column =0,columnspan=1,pady = 20 ,sticky=NSEW)
+            self.bouton.pack(fill="x", expand="yes") 
 
-    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-def new4(self):
-        self.ngroup = int(self.ent0[0].get())
-        self.nmat   = int(self.ent0[2].get())
-        self.order   = int(self.ent0[4].get())
-        self.tab4  = [[[[0]*self.ngroup]*self.ngroup]*self.nmat]*(self.order+1)
-        if  self.ngroup == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy groups")
+    elif M00 == 'FissionXS':
+        if  self.ng == 0:
+            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
         elif self.nmat == 0:
             tkMessageBox.showwarning("Warning", "Enter the number of materials")
         else:
@@ -197,258 +223,412 @@ def new4(self):
             self.newWindow.columnconfigure(0, weight=1)
             self.newWindow.rowconfigure(0, weight=1)
             self.newWindow.resizable(True,True)
-            if  self.order <=0 :
-                if self.nmat <=1:
-                    if  self.ngroup <= 2:
-                        self.newWindow.geometry("488x200+550+250")
             self.newWindow.title("Parameters input")
-            Frame01 = LabelFrame(self.newWindow, text="Scatter Cross Section (SigS)",
-                                 font=("Helvetica", 10), fg='blue',bg=self.boutton)
-            Frame01.grid(sticky=NSEW)
-            if np.size(self.tab4) > np.size(self.SigS): 
-                self.Vect3  = [0]*self.ngroup*self.ngroup*self.nmat*(self.order+1)
-
-            self.lab = [0]*self.ngroup*self.ngroup*self.nmat*(self.order+1)
-            self.ent7 = [0]*self.ngroup*self.ngroup*self.nmat*(self.order+1)
-            m1 =  0
-            m  =  0
-            for i in range(self.nmat):
-                self.lab[m] = Label(Frame01, width=17, text="Material %s" %(i+1),anchor='w',bg=self.boutton)
-                self.lab[m].grid(row=m1, column=0,sticky=NSEW)
-
-                for k in range(self.ngroup):
-                    self.lab[k] = Label(Frame01, width=10, text="G %s" %(k+1),anchor='w',bg=self.boutton)
-                    self.lab[k].grid(row=1+m1, column=k+2,sticky=NSEW)
-
-                for l in range(self.order+1):
-                    self.lab[l] = Label(Frame01, width=10, text="Legendre Order L = %s" %(l),anchor='w',bg=self.boutton)
-                    self.lab[l].grid(row=1+m1, column=0,sticky=NSEW)
-
-                    for j in range(self.ngroup):
-                        self.lab[j] = Label(Frame01, width=10, text="G %s" %(j+1),anchor='w',bg=self.boutton)
-                        self.lab[j].grid(row=m1+2, column=1,sticky=NSEW)
-
-                        for n in range(self.ngroup):
-                            self.ent7[m] = Entry(Frame01, width=10)
-                            self.ent7[m].grid(row=m1+2, column=n+2,sticky=NSEW)
-                            self.ent7[m].delete(0,'end')
-                            self.ent7[m].insert(0,self.Vect3[m])
-                            m = m + 1
-
-
-                        m1 = 1+m1 
-                    m1 = 1+m1  
-                m1 = 1+m1 
-            self.bouton = Button(Frame01,text="Save", font='Times',command=self.save4)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
-            self.bouton.grid(row =m1, column =0,columnspan=1,pady = 20 ,sticky=NSEW)   
-
-def new5(self):
-        self.ngroup = int(self.ent0[0].get())
-        self.nmat   = int(self.ent0[2].get())
-        self.tab5  = [[0]*self.ngroup]*self.nmat
-        if  self.ngroup == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy groups")
-        elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of materials")
-        else:
-            self.newWindow = Toplevel()
-            self.newWindow.grab_set()
-            self.newWindow.focus_set()
-            self.newWindow.columnconfigure(0, weight=1)
-            self.newWindow.rowconfigure(0, weight=1)
-            self.newWindow.resizable(True,True)
-            if  self.nmat <= 3:
-                if  self.ngroup <= 4:
-                    self.newWindow.geometry("432x180+550+250")
-            self.newWindow.title("Parameters input")
-            Frame01 = LabelFrame(self.newWindow, text="Density Function for Neutrons (Chi)",
-                                font=("Helvetica", 10), fg='blue',bg=self.boutton)
-            Frame01.grid(sticky=NSEW)
-            if np.size(self.tab5) > np.size(self.Chi): 
-                self.Vect4  = [0]*self.ngroup*self.nmat
-           
-            self.lab = [0]*100
-            self.ent8 = [0]*100
+            labelframe = LabelFrame(self.newWindow, text="Total Cross Section (SigF)",fg='blue')  
+            labelframe.pack(fill="both", expand="yes") 
+            self.SigF  = [0]*self.ng*self.nmat
+            self.lab7 = [0]*self.ng*self.nmat
+            self.ent7 = [0]*self.ng*self.nmat
             m = 0
             for j in range(self.nmat):
-                self.lab[j] = Label(Frame01, width=10, text="Material %s" %(j+1),anchor='w',bg=self.boutton)
-                self.lab[j].grid(row=j+1, column=0,sticky=NSEW)
-                for i in range(self.ngroup):
-                    self.lab[i] = Label(Frame01, width=10, text="G %s" %(i+1),anchor='w',bg=self.boutton)
-                    self.lab[i].grid(row=0, column=i+1,sticky=NSEW)
-                    self.ent8[m] = Entry(Frame01, width=10)
+                self.lab7[j] = Label(labelframe, width=10, text="Material %s" %(j+1),anchor='center')
+                self.lab7[j].grid(row=j+1, column=0,sticky=NSEW)
+                for i in range(self.ng):
+                    self.lab7[i] = Label(labelframe, width=10, text="G %s" %(i+1),anchor='center')
+                    self.lab7[i].grid(row=0, column=i+1,sticky=NSEW)
+                    self.ent7[m] = Entry(labelframe, width=10)
+                    self.ent7[m].grid(row=j+1, column=i+1,sticky=NSEW)
+                    self.ent7[m].delete(0,'end')
+                    self.ent7[m].insert(0,self.SigF[m])
+                    m+=1
+            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save5)
+            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton.pack(fill="x", expand="yes") 
+
+    elif M00 == 'NuFissionXS':
+        if  self.ng == 0:
+            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+        elif self.nmat == 0:
+            tkMessageBox.showwarning("Warning", "Enter the number of materials")
+        else:
+            self.newWindow = Toplevel()
+            self.newWindow.grab_set()
+            self.newWindow.focus_set()
+            self.newWindow.columnconfigure(0, weight=1)
+            self.newWindow.rowconfigure(0, weight=1)
+            self.newWindow.resizable(True,True)
+            self.newWindow.title("Parameters input")
+            labelframe = LabelFrame(self.newWindow, text="Total Cross Section (NuSigF)",fg='blue')  
+            labelframe.pack(fill="both", expand="yes") 
+
+            self.lab8 = [0]*self.ng*self.nmat
+            self.ent8 = [0]*self.ng*self.nmat
+            self.NuSigF  = [0]*self.ng*self.nmat
+            m = 0
+            for j in range(self.nmat):
+                self.lab8[j] = Label(labelframe, width=10, text="Material %s" %(j+1),anchor='center')
+                self.lab8[j].grid(row=j+1, column=0,sticky=NSEW)
+                for i in range(self.ng):
+                    self.lab8[i] = Label(labelframe, width=10, text="G %s" %(i+1),anchor='center')
+                    self.lab8[i].grid(row=0, column=i+1,sticky=NSEW)
+                    self.ent8[m] = Entry(labelframe, width=10)
                     self.ent8[m].grid(row=j+1, column=i+1,sticky=NSEW)
                     self.ent8[m].delete(0,'end')
-                    self.ent8[m].insert(0,self.Vect4[m])
-                    m+=1
- 
-            self.bouton = Button(Frame01,text="Save", font='Times',command=self.save5)
+                    self.ent8[m].insert(0,self.NuSigF[m])
+                    m=m+1
+            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save6)
             self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
-            self.bouton.grid(row =j+2, column =0,columnspan=1,pady = 20 ,sticky=NSEW)
+            self.bouton.pack(fill="x", expand="yes") 
+
+    elif M00 == 'ScatterMatrixXS':
+        if  self.ng == 0:
+            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+        elif self.nmat == 0:
+            tkMessageBox.showwarning("Warning", "Enter the number of materials")
+        else:
+            self.newWindow = Toplevel()
+            self.newWindow.grab_set()
+            self.newWindow.focus_set()
+            self.newWindow.columnconfigure(0, weight=1)
+            self.newWindow.rowconfigure(0, weight=1)
+            self.newWindow.resizable(True,True)
+            self.newWindow.title("Parameters input")
+            self.lab9 = [0]*self.ng*self.nmat*self.ng*self.order
+            self.ent9 = [0]*self.ng*self.nmat*self.ng*self.order
+            self.SigS  = [0]*self.ng*self.nmat*self.ng*self.order
+            labelframe = LabelFrame(self.newWindow, text="Scatter Matrix Cross Section (SigS)",fg='blue')  
+            labelframe.pack(fill="both", expand="yes") 
+
+            tabControl = ttk.Notebook(labelframe)
+            tab2 = [0]*self.nmat
+            labelframe = [0]*self.order
+            m2= 0
+            for j in range(self.nmat):
+                tab2[j] = ttk.Frame(tabControl) 
+                tabControl.add(tab2[j], text ="Material %s" %(j+1)) 
+                tabControl.pack(expand = 1, fill ="both") 
+                for i in range(self.order):
+                    labelframe[i] = LabelFrame(tab2[j], text="Legender Order L= %s" %(i),fg='blue')  
+                    labelframe[i].pack(fill="both", expand="yes") 
+                    m = 0
+                    for k in range(self.ng):
+                        self.lab9[k] = Label(labelframe[i], width=10, text="G %s" %(k+1),anchor='center')
+                        self.lab9[k].grid(row=1, column=k+1,sticky=NSEW)
+                        m1=0
+                        for n in range(self.ng):
+                            self.lab9[m2] = Label(labelframe[i], width=10, text="G %s" %(n+1),anchor='center')
+                            self.lab9[m2].grid(row=m1+2, column=0, sticky=NSEW)
+                            self.ent9[m2] = Entry(labelframe[i], width=10)
+                            self.ent9[m2].grid(row=m1+2, column=m+1, sticky=NSEW)
+                            self.ent9[m2].delete(0,'end')
+                            self.ent9[m2].insert(0,self.SigS[m2])
+                            m1+=1
+                            m2+=1 
+                        m+=1
+                    m1+=1
+            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save7)
+            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton.pack(fill="x", expand="yes") 
+
+    elif M00 == 'ChiXS':
+        if  self.ng == 0:
+            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+        elif self.nmat == 0:
+            tkMessageBox.showwarning("Warning", "Enter the number of materials")
+        else:
+            self.newWindow = Toplevel()
+            self.newWindow.grab_set()
+            self.newWindow.focus_set()
+            self.newWindow.columnconfigure(0, weight=1)
+            self.newWindow.rowconfigure(0, weight=1)
+            self.newWindow.resizable(True,True)
+            self.newWindow.title("Parameters input")
+            labelframe = LabelFrame(self.newWindow, text="Density Function for Neutrons (Chi)",fg='blue')  
+            labelframe.pack(fill="both", expand="yes") 
+
+            self.lab10 = [0]*self.ng*self.nmat
+            self.ent10 = [0]*self.ng*self.nmat
+            self.Chi  = [0]*self.ng*self.nmat
+            m = 0
+            for j in range(self.nmat):
+                self.lab10[j] = Label(labelframe, width=10, text="Material %s" %(j+1),anchor='center')
+                self.lab10[j].grid(row=j+1, column=0,sticky=NSEW)
+                for i in range(self.ng):
+                    self.lab10[i] = Label(labelframe, width=10, text="G %s" %(i+1),anchor='center')
+                    self.lab10[i].grid(row=0, column=i+1,sticky=NSEW)
+                    self.ent10[m] = Entry(labelframe, width=10)
+                    self.ent10[m].grid(row=j+1, column=i+1,sticky=NSEW)
+                    self.ent10[m].delete(0,'end')
+                    self.ent10[m].insert(0,self.Chi[m])
+                    m=m+1
+            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save8)
+            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton.pack(fill="x", expand="yes") 
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 def save1(self):
-        del self.Delta[:]
-        del self.REGMAT[:]
-        del self.NFMR[:] 
-        for i in range(self.nregion):
-            self.Delta.append(eval(self.ent2[i+1].get()))
-            self.NFMR.append(eval(self.ent3[i+1].get()))
-            self.REGMAT.append(eval(self.ent4[i+1].get()))
-        self.newWindow.destroy()
+    m=0
+    self.Delta  = []
+    self.REGMAT = []
+    self.NFMR   = [] 
+    for i in range(self.np):
+        self.Delta.append([])
+        self.REGMAT.append([])
+        self.NFMR.append([])
+        for j in range(self.nx):
+            self.Delta[i].append(eval(self.ent1[m].get()))
+            self.REGMAT[i].append(eval(self.ent2[m].get()))
+            self.NFMR[i].append(eval(self.ent3[m].get()))
+            m+=1
+    self.newWindow.destroy()
 
 def save2(self):
+    m=0
+    self.assm = []
+    for i in range(self.na):
+        self.assm.append([])
+        for j in range(self.nxa):
+            self.assm[i].append(eval(self.ent4[m].get()))
+            m+=1
+    self.newWindow.destroy()
+
+def save3(self):
+    self.core  = []
+    for i in range(self.na):
+        self.core.append(eval(self.ent5[i].get()))
+    self.newWindow.destroy()
+
+def save4(self):
     m=0
     self.SigT = []
     for i in range(self.nmat):
         self.SigT.append([])
-        for j in range(self.ngroup):
-            self.SigT[i].append(eval(self.ent5[m].get())) 
+        for j in range(self.ng):
+            self.SigT[i].append(eval(self.ent6[m].get())) 
             m+=1
-    m = 0
-    for i in range(self.nmat):
-        for j in range(self.ngroup):
-            self.Vect1[m] = eval(self.ent5[m].get())
-            m +=1
     self.newWindow.destroy()
 
-def save3(self):
+def save5(self):
+    m=0
+    self.SigF  = []
+    for i in range(self.nmat):
+        self.SigF.append([])
+        for j in range(self.ng):
+            self.SigF[i].append(eval(self.ent7[m].get())) 
+            m+=1
+    self.newWindow.destroy()
+
+def save6(self):
     m=0
     self.NuSigF  = []
     for i in range(self.nmat):
         self.NuSigF.append([])
-        for j in range(self.ngroup):
-            self.NuSigF[i].append(eval(self.ent6[m].get())) 
+        for j in range(self.ng):
+            self.NuSigF[i].append(eval(self.ent8[m].get())) 
             m+=1
-    m=0
-    for i in range(self.nmat):
-        for j in range(self.ngroup):
-            self.Vect2[m] = eval(self.ent6[m].get())
-            m +=1
     self.newWindow.destroy()
-def save4(self):
-    self.order   = int(self.ent0[4].get())
+
+def save7(self):
+    self.order   = int(self.ent0[8].get())
     self.SigS = []
     m=0
     for i in range(self.nmat):
         self.SigS.append([])
         for l in range(self.order+1):
             self.SigS[i].append([])
-            for j in range(self.ngroup):
+            for j in range(self.ng):
                 self.SigS[i][l].append([])
-                for n in range(self.ngroup):
-                    self.SigS[i][l][j].append(eval(self.ent7[m].get()))
+                for n in range(self.ng):
+                    self.SigS[i][l][j].append(eval(self.ent9[m].get()))
                     m+=1
-
-    m = 0
-    for i in range(self.nmat):
-        for l in range(self.order+1):
-            for j in range(self.ngroup):
-                for n in range(self.ngroup):
-                    self.Vect3[m] = eval(self.ent7[m].get())
-                    m +=1
     self.newWindow.destroy()
 
-def save5(self):
+def save8(self):
     m=0
     self.Chi  = []
     for i in range(self.nmat):
         self.Chi.append([])
-        for j in range(self.ngroup):
-            self.Chi[i].append(eval(self.ent8[m].get())) 
+        for j in range(self.ng):
+            self.Chi[i].append(eval(self.ent10[m].get())) 
             m+=1
-    m = 0
-    for i in range(self.nmat):
-        for j in range(self.ngroup):
-            self.Vect4[m] = eval(self.ent8[m].get())
-            m +=1
     self.newWindow.destroy()
-###### Drow geometry   <>
+###### Drow geometry   
 def Draw(self):
-        filename = open('app/link/script.py', "r" ).read()
-        with open(filename) as json_data:
-            data = json.load(json_data)
-            l = data['data']['parameter']['Size of each region [cm]']
-            self.nmat = data['data']['parameter']['Total number of Materials']
-            self.nregion = data['data']['parameter']['Total number of regions'] 
-            self.regmat = data['data']['parameter']['Which material fills each region']
+    filename = open('app/link/script.dir', "r" ).read()
+    fmm_id = []
+    assembly = []
+    pin = []
+    regmat = []
+    nom    = []
+    width_x = []
+    width_y = []
+    with open(filename) as json_data:
+        data = json.load(json_data)
+        nmat = data['data']['parameter']['Total number of materials']
+        npc = data['data']['parameter']['Total number of pin cells']  
+        na  = data['data']['parameter']['Total number of assemblies'] 
+        core = data['data']['parameter']['Core']
+
+        for i in range(na):
+            assembly.append(data['data']['Assemblies'][i]['assembly'])
+
+        for i in range(npc):
+            pin.append(data['data']['PinCells'][i]['mat_fill'])
+
+        Height = 1
+        width = len(core)*len(pin[0])*len(assembly[0])
+        fmm_id =numpy.zeros((width),dtype='i')
+        i=0
+        for j in range(len(core)):
+            for k in range(len(assembly[0])):
+                for m in range(len(pin[0])):
+                    fmm_id[i] = pin[assembly[core[j]-1][k]-1][m]
+                    i+=1
+        nx = len(core)
+        ny = 1
+           
+        nxx = len(assembly[0])
+        nyy = 1
+        NX = nxx*nx
+        NY = ny*nyy
+        width_x.append(data['data']['PinCells'][0]['width'])
+        width_y = [2]
+        nx =  len(width_x[0])*NX
+        ny =  1
+        xcm  = width_x[0]*NX
+        ycm  = width_y[0]*NY
+        for j in range(nmat):
+            nom.append(data['data']['materials'][j]['name'])
+        for i in range(npc):
+            regmat.append(data['data']['PinCells'][i]['mat_fill'])
         fig, ax = plt.subplots(figsize=(5, 4), dpi=100)
-        width = [0]
-        som = [0]
-        for i in range(self.nregion):
-          width.append(l[i])
-          som.append(sum(width))
+        widthx = [0]
+        widthy = [0]
+        somx = [0]
+        somy = [0]
+        for i in range(nx):
+            widthx.append(xcm[i])
+            somx.append(sum(widthx))
+
+        widthy = [2.0]
+        somy = [2.0]
+        ycm = [2.0]
         rectangles = []
         red_patch = []
-        m = som[0]
-
-        for n in range(self.nregion):
-          rectangles.append(mpatch.Rectangle((som[n],-5), abs(som[n+1])-abs(som[n]), 10))
-        colr = ['#00ffff',"yellow",'g','r',"Green","Grey",'b', 'y', 'r', 'c', 'm', 'y', 'k', 'w'] 
-        i=0
+        mx = somx[0]
+        my = somy[0]
+            
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.77, box.height])
+        for i in range(nx):
+            for j in range(ny):
+                rectangles.append(mpatch.Rectangle((somx[i],somy[j]), xcm[i], ycm[j],linewidth=0.0,edgecolor='k'))
+        colr = colors = ['#ff6666','#ffcc99', '#99ff99', '#66b3ff','#c2c2f0','#ffb3e6', 
+                             '#c2c2f0','#ffb3e6', '#c2c2f0','#ffb3e6', '#c2c2f0','#ffb3e6']
+        for i in range(nmat):
+            red_patch.append(mpatches.Patch(color=colr[i], label=nom[i]))
+            
+        n=0
         for r in rectangles:
             ax.add_artist(r) 
-            r.set_facecolor(color=colr[self.regmat[i]-1])
+            r.set_facecolor(color=colr[int(fmm_id[n])-1])
+
             rx, ry = r.get_xy()
             cx = rx + r.get_width()/2.0
             cy = ry + r.get_height()/2.0
-            i=i+1
-        for i in range(self.nmat):
-            red_patch.append(mpatch.Patch(color=colr[i], label="Mat %s" %(i+1)))
+            n+=1
 
-        ax.set_ylim((-10, 10))
-        ax.set_xlim((min(som), max(som)))
+        ax.set_ylim((1,5))
+        ax.set_xlim((min(somx), max(somx)))
+            #ax.set_xticklabels([])
+        ax.set_yticklabels([]) 
         ax.set_xlabel('X [cm]')
+            #ax.set_ylabel('Y [cm]')
         ax.set_title('Color by Materials') 
-        plt.legend(handles=red_patch)
+        clb = plt.legend(handles=red_patch,loc='center left',title="Materials",
+                         fontsize='small',bbox_to_anchor=(1, 0.5))
         plt.show()
 
 def exit_editor(self):
         if tkMessageBox.askokcancel("Quit", "Do you really want to quit?"):
             self.root.destroy()
-def data_up(self):
-        self.ngroup = int(self.ent0[0].get())
-        self.nregion  = int(self.ent0[1].get())
-        self.nmat   = int(self.ent0[2].get())
-        if  self.ngroup == 0:
-            tkMessageBox.showwarning("Warning", "Enter the Input Parametres")
-        elif self.nregion == 0:
-            tkMessageBox.showwarning("Warning", "Enter the Input Parametres")
-        elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the Input Parametres")   
-        else:
-            global filename  # 
-            filename = open("app/input/input.json",'w')
-            open('app/link/script.py', "w" ).write(os.path.abspath(os.path.dirname( __file__)) +'/input/input.json')
-            filename.write('{ \n  "data": { \n    "parameter": { \n      "id": 100,')
-            filename.write('\n      "Total number of energy groups": '+ self.ent0[0].get() +',')
-            filename.write('\n      "Total number of Materials": '+ self.ent0[2].get() +',')
-            filename.write('\n      "Total number of regions": '+ self.ent0[1].get() +',')
-            filename.write('\n      "Which material fills each region": '+ str(self.REGMAT) +',')
-            filename.write('\n      "Size of each region [cm]": '+ str(self.Delta) +',')
-            filename.write('\n      "Number of fine meshes": '+ str(self.NFMR) +',')  
-            filename.write('\n      "Number of Angular Discretization": '+ self.ent0[3].get() +',')
-            filename.write('\n      "The l-order Legendre polynomial": '+ self.ent0[4].get() +',')
-            filename.write('\n      "Maximum Number of Iterations": '+ self.ent1[0].get() +',')
-            filename.write('\n      "Criterion of Keff convergence": '+ self.ent1[1].get())
-            filename.write('\n    }, \n    "materials": [')
-            # Ici Boucle
-            for i in range(self.nmat):
-                filename.write('\n      { \n        "id": '+ str(i+1) +', \n        "name": "material '+ str(i+1) +'",') 
-                filename.write('\n        "XSTotal": ' + str(self.SigT[i][:]) +',' + '\n        "XSNuFission": '+ str(self.NuSigF[i][:])+',')
-                filename.write('\n        "XSScatter Matrix":'+str(self.SigS[i][:][:][:])+','+ '\n        "XSChi":  '+str(self.Chi[i][:]))
-                if i == self.nmat-1:
-                    filename.write('\n      }')
-                else:
-                    filename.write('\n      },')  
-            # Fin Boucle
-            filename.write('\n    ]  \n  }  \n}') 
-            filename.close() 
-            self.textPad.delete(1.0,END)     
-            fh = open("app/input/input.json","r")        
-            self.textPad.insert(1.0,fh.read()) 
-            fh.close()
-            self.update_line_number()
+def data_up(self,event=None):
+    self.ng    = int(self.ent0[0].get())
+    self.nmat  = int(self.ent0[1].get())
+    self.np    = int(self.ent0[2].get())
+    self.nx    = int(self.ent0[3].get())
+    self.nxa   = int(self.ent0[4].get())
+    self.na    = int(self.ent0[5].get())
+    self.order = int(self.ent0[8].get())+1
+    if self.ng == 0:
+        tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+    elif self.nmat == 0:
+        tkMessageBox.showwarning("Warning", "Enter the number of materials")
+    elif self.np == 0:
+        tkMessageBox.showwarning("Warning", "Enter the pin cells number")
+    elif self.nx == 0:
+        tkMessageBox.showwarning("Warning", "Enter the x mesh pin cell number \n"+
+                                 "(Each pin cell is approximated by a x cartesian grid)")  
+    else:
+        global filename  # 
+        filename = open("app/input/input.json",'w')
+        open('app/link/script.dir', "w" ).write(os.path.abspath(os.path.dirname( __file__)) +'/input/input.json')
+        PATH = open(os.getcwd()+'/app/link/script.dir', "r" ).read()
+        print PATH
+        self.root.title(os.path.basename(PATH) + '- Sotution of the Transport Equation'
+            ' by Multigroup Methods')
+        filename.write('{ \n  "data": { \n    "parameter": { \n      "id": 100,')
+        filename.write('\n      "Total number of energy groups": '+ self.ent0[0].get() +',')
+        filename.write('\n      "Total number of materials": '+ self.ent0[1].get() +',')  
+        filename.write('\n      "Total number of pin cells": '+ self.ent0[2].get() +',') 
+        filename.write('\n      "Total number of assemblies": '+ self.ent0[5].get() +',')
+        filename.write('\n      "Total number of active pin cells": '+ self.ent0[7].get() +',') 
+        filename.write('\n      "Core": '+ str(self.core) +',')
+        filename.write('\n      "Number of angular discretizations": '+ self.ent0[6].get() +',')
+        filename.write('\n      "The l-order Legendre polynomial": '+ self.ent0[8].get() +',')
+        filename.write('\n      "Maximum number of iterations": '+ self.ent0[9].get() +',')
+        filename.write('\n      "Criterion of Keff convergence": '+ self.ent0[10].get())
+        filename.write('\n    }, \n    "Assemblies": [')
+        # loop on assembly
+        for i in range(self.na):
+            filename.write('\n      { \n        "id": '+ str(i+1) +', \n        "name": "Assembly '+ str(i+1) +'",') 
+            filename.write('\n        "assembly": ' + str(self.assm[i]))
+            if i == self.na-1:
+                filename.write('\n      }')
+            else:
+                filename.write('\n      },') 
+        filename.write('\n ], \n    "PinCells": [') 
+        # loop on pin cell
+        for i in range(self.np):
+            filename.write('\n      { \n        "id": '+ str(i+1) +', \n        "name": "PinCell '+ str(i+1) +'",') 
+            filename.write('\n        "width": ' + str(self.Delta[i])+',')
+            filename.write('\n        "mat_fill": ' + str(self.REGMAT[i])+',')
+            filename.write('\n        "fine_mesh": ' + str(self.NFMR[i]))
+            if i == self.np-1:
+                filename.write('\n      }')
+            else:
+                filename.write('\n      },') 
+        filename.write('\n ], \n    "materials": [') 
+        # loop on material
+        for i in range(self.nmat):
+            filename.write('\n      { \n        "id": '+ str(i+1) +', \n        "name": "material '+ str(i+1) +'",') 
+            filename.write('\n        "XSTotal": ' + str(self.SigT[i][:])+',')
+            filename.write('\n        "XSFission": ' + str(self.SigF[i][:])+',')
+            filename.write('\n        "XSNuFission": ' + str(self.NuSigF[i][:])+',')
+            filename.write('\n        "XSScatter Matrix":'+str(self.SigS[i][:][:][:])+',')
+            filename.write('\n        "XSChi":  '+str(self.Chi[i][:]))
+            if i == self.nmat-1:
+                filename.write('\n      }')
+            else:
+                filename.write('\n      },')  
+        filename.write('\n    ]  \n  }  \n}') 
+        filename.close() 
+        self.textPad.delete(1.0,END)     
+        fh = open("app/input/input.json","r")        
+        self.textPad.insert(1.0,fh.read()) 
+        fh.close()
+        self.update_line_number()
+
 
 def on_find(self,event=None):
         t2 = Toplevel(self.root)
@@ -481,12 +661,11 @@ def open_file(self,event=None):
         global filename
         filename = tkFileDialog.askopenfilename(defaultextension=".json",
                 filetypes=[("All Files","*.*"),("Text Documents","*.txt")])
-        open('app/link/script.py', "w" ).write(str(filename))
+        open('app/link/script.dir', "w" ).write(str(filename))
         if filename == "": # If no file chosen.
             filename = None # Absence of file.
         else:
-            self.root.title(os.path.basename(filename) + '- Sotution of the Transport Equation'
-            ' by Multigroup Methods') # Returning the basename of 'file'
+            self.root.title(os.path.basename(filename)) # Returning the basename of 'file'
             self.textPad.delete(1.0,END)         
             fh = open(filename,"r")        
             self.textPad.insert(1.0,fh.read()) 
@@ -598,25 +777,17 @@ def select00(self):
         open('app/link/script00.py', "w" ).write(self.value00.get()) 
         if  int(self.value00.get())==1:
             self.button[0].config(bg='#00ffff')
-       
-        else: 
-            self.button[0].config(bg='grey76')
-            self.ent0[3].config(state=NORMAL) 
-
-def select01(self):
-        self.value01.get()
-        open('app/link/script01.py', "w" ).write(self.value01.get()) 
-        if  int(self.value01.get())==1:
-            self.button[1].config(bg='#00ffff')
-        else:
             self.button[1].config(bg='grey76')
-def select02(self):
-        self.value02.get()
-        open('app/link/script02.py', "w" ).write(self.value02.get()) 
-        if  int(self.value02.get())==1:
-            self.button[2].config(bg='#00ffff')
-        else:
             self.button[2].config(bg='grey76')
+        elif int(self.value00.get())==2:
+            self.button[1].config(bg='#00ffff')
+            self.button[0].config(bg='grey76')
+            self.button[2].config(bg='grey76')
+        elif  int(self.value00.get())==3:
+            self.button[2].config(bg='#00ffff')
+            self.button[0].config(bg='grey76')
+            self.button[1].config(bg='grey76')
+
 def select03(self):
         self.value03.get()
         open('app/link/script03.py', "w" ).write(self.value03.get())
@@ -628,10 +799,36 @@ def select07(self):
         open('app/link/script07.py', "w" ).write(self.value07.get())
 def select08(self):
         self.value08.get()
-        open('app/link/script08.py', "w" ).write(self.value08.get())    
+        open('app/link/script08.py', "w" ).write(self.value08.get())
+        if  str(self.value08.get())=="vacuum":
+            self.button1[0].config(bg='#00ffff')
+            self.button1[1].config(bg='grey76')
+            self.button1[2].config(bg='grey76')
+            self.button1[3].config(bg='grey76')
+        elif  str(self.value08.get())=="reflective":
+            self.button1[1].config(bg='#00ffff')
+            self.button1[0].config(bg='grey76')
+            self.button1[2].config(bg='grey76')
+            self.button1[3].config(bg='grey76')
+        elif  str(self.value08.get())=="vacuum_reflective":
+            self.button1[2].config(bg='#00ffff')
+            self.button1[1].config(bg='grey76')
+            self.button1[0].config(bg='grey76')
+            self.button1[3].config(bg='grey76')
+        elif  str(self.value08.get())=="reflective_vacuum":
+            self.button1[3].config(bg='#00ffff')
+            self.button1[1].config(bg='grey76')
+            self.button1[2].config(bg='grey76')
+            self.button1[0].config(bg='grey76')
+
+def select02(self,enent=None):
+        self.value02.get()
+        open('app/link/script02.py', "w" ).write(self.value02.get())  
+
 def select09(self,enent=None):
-        self.value09.get()
-        open('app/link/script09.py', "w" ).write(self.value09.get())  
+        self.value01.get()
+        open('app/link/script01.py', "w" ).write(self.value01.get())  
+
 def select10(self,enent=None):
         self.value10.get()
         open('app/link/script10.py', "w" ).write(self.value10.get())
@@ -639,55 +836,79 @@ def select10(self,enent=None):
 def popup(self,event):
         self.cmenu.tk_popup(event.x_root, event.y_root, 0)
 
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+def powerpf(self,enent=None):
+        #define plot size in inches (width, height) & resolution(DPI)
+        fig = plt.figure(figsize=(5, 4), dpi=100)
+        M00 = open('app/link/script00.py', "rb" ).read() 
+        if int(M00) == 1:
+            data = np.loadtxt('app/Output/PF_CP.H')
+        elif int(M00) == 2:
+            data = np.loadtxt('app/Output/PF_SN.H')
+        elif int(M00) == 3:
+            data = np.loadtxt('app/Output/PF_MOC.H')
+        else:
+            tkMessageBox.showwarning("Warning", "select the calculation method")
+        max_columns = 1
+        max_rows = len(data)-1      
+        y_pos = np.arange(1,max_rows+1,1)
+        plt.bar(y_pos, data[1:], align='center',  facecolor='red', alpha=0.5)
+        plt.xticks(y_pos)
+        if int(M00) == 1:
+            plt.title("CP Method")
+        elif int(M00) == 2:
+            plt.title("SN Method") 
+        elif int(M00) == 3:
+            plt.title("MOC")    
+        plt.xlabel('Pin Cell')
+        plt.ylabel('Normalized Pin Power Distribution')
+        plt.show()
 
 def plot(self,enent=None):
         #define plot size in inches (width, height) & resolution(DPI)
         fig = plt.figure(figsize=(5, 4), dpi=100)
         M00 = open('app/link/script00.py', "rb" ).read() 
-        M01 = open('app/link/script01.py', "rb" ).read()
-        M02 = open('app/link/script02.py', "rb" ).read()
-
-        if M00 == str(1):
-            data = np.loadtxt('app/Output/flux_cp.h')
-        elif M01 == str(1):
-            data = np.loadtxt('app/Output/flux_sn.h')
-        elif M02 == str(1):
-            data = np.loadtxt('app/Output/flux_moc.h')
+        if int(M00) == 1:
+            data = np.loadtxt('app/Output/FLUX_CP.H')
+        elif int(M00) == 2:
+            data = np.loadtxt('app/Output/FLUX_SN.H')
+        elif int(M00) == 3:
+            data = np.loadtxt('app/Output/FLUX_MOC.H')
         else:
             tkMessageBox.showwarning("Warning", "select the calculation method")
 
         if int(len(data)) >= 0:
-           
-            if M00 != str(0) or M01 != str(0) or M02 != str(0):
-                matrix = []  
-                for line in data:
-                    matrix.append(line)
-                max_columns = len(matrix[0]) - 1
-                max_rows = len(matrix)
-                x = [matrix[rownum][0] for rownum in range(max_rows)]
-                y = [[matrix[rownum][colnum + 1] for rownum in range(max_rows)]for colnum in range(max_columns)]
-                p = [0]*max_columns
-                for i in range(max_columns):
-                    key = 'Group', int(i+1)
-                    p[i] = plt.plot(x,y[i] ,label="Group %s" %(max_columns-i),linewidth=1)
-                #p[i] = plt.plot(x,y[i] ,label="Group %s" %(max_columns-i),marker=".",linewidth=1)
-                if M00 == str(1):
-                    plt.title("CP Method")
-                elif M01 == str(1):
-                    plt.title("SN Method") 
-                elif M02 == str(1):
-                    plt.title("MOC")    
-                plt.xlabel('Distance [cm]')
-                plt.ylabel('Normalized Flux')
-                plt.legend()
-                plt.show()
+            matrix = []  
+            for line in data:
+                matrix.append(line)
+            max_columns = len(matrix[0]) - 1
+            max_rows = len(matrix)
+            x = [matrix[rownum][0] for rownum in range(max_rows)]
+            y = [[matrix[rownum][colnum + 1] for rownum in range(max_rows)]for colnum in range(max_columns)]
+            p = [0]*max_columns
+            name = ['OpenMC','CP','SN','MOC']
+            tt = ['g--','o','k:','r']
+            for i in range(max_columns):
+                #p[i] = plt.plot(x,y[i] ,tt[i],label=name[i])
+                p[i] = plt.plot(x,y[i] ,label="Group %s" %(max_columns-i),linewidth=1)
+            if int(M00) == 1:
+                plt.title("CP Method")
+            elif int(M00) == 2:
+                plt.title("SN Method") 
+            elif int(M00) == 3:
+                plt.title("MOC")    
+            plt.xlabel('Distance  [cm]')
+            #plt.xticks(range(1,52,5))
+            plt.ylabel('Normalized Flux')
+            plt.legend()
+            plt.show()
         else:
             tkMessageBox.showwarning("Warning", "Select More than a Fine Number of Meshes")
 def geometry():
         print 'geometry'
 
 def run(event=None):
-    proc = subprocess.Popen(['python', 'app/python.py'],
+    proc = subprocess.Popen(['python', 'main.py'],
                                 stdout=subprocess.PIPE, 
                                 stderr=subprocess.PIPE)
     a = None
@@ -709,10 +930,8 @@ def run(event=None):
 
 def compile():
     M00 = open('app/link/script00.py', "r" ).read()  
-    M01 = open('app/link/script01.py', "r" ).read()
-    M02 = open('app/link/script02.py', "r" ).read()  
 
-    if M00 == str(1):
+    if int(M00) == 1:
         if os.path.exists('app/SlabCP.so'):
             os.remove('app/SlabCP.so')
         proc = subprocess.Popen(['f2py','-c','app/sources/TRANSPORT_CP.f90','-m','SlabCP'],
@@ -727,7 +946,7 @@ def compile():
                 print text
         shutil.move('SlabCP.so', 'app') 
     
-    elif M01 == str(1):
+    elif int(M00) == 2:
         if os.path.exists('app/SlabSN.so'):
             os.remove('app/SlabSN.so') 
         proc = subprocess.Popen(['f2py','-c','app/sources/TRANSPORT_SN.f90','-m','SlabSN'], 
@@ -742,7 +961,7 @@ def compile():
                 print text
         shutil.move('SlabSN.so', 'app')
 
-    elif M02 == str(1):
+    elif int(M00) == 3:
         if os.path.exists('app/SlabMOC.so'):
             os.remove('app/SlabMOC.so')
         proc = subprocess.Popen(['f2py','-c','app/sources/TRANSPORT_MOC.f90','-m','SlabMOC'],
