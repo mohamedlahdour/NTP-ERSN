@@ -3,7 +3,7 @@
 In this project we develop a package NTP-ERSN to solve a neutron transport equation.
 
 
-NTP-ERSN (Neutron Transport Package-Equipe de la Radiation et des systèmes nucleaires), is an open-source code, developed at the Abdelmalek Essaadi University, Tetouan, Morocco, written by FORTRAN90 for educational purposes to solve the equation of multi-group neutron transport in steady-state using a deterministic approach [Lahdour et al., 2019a](https://doi.org/10.1016/j.apradiso.2018.12.004) such as:
+NTP-ERSN (Neutron Transport Package-Equipe Radiations et Systèmes Nucléaires), is an open-source code, developed at the Abdelmalek Essaadi University, Tetouan, Morocco, written by FORTRAN90 for educational purposes to solve the equation of multi-group neutron transport in steady-state using a deterministic approach [Lahdour et al., 2019a](https://doi.org/10.1016/j.apradiso.2018.12.004) such as:
 
 
 Neutron Transport Package NTP-ERSN(Open Neutron Transport Package from the Radiations and Nuclear Systems Group), is an open-source code written in FORTRAN90 for a pedagogical purpose to solve the steady-state multigroup neutron transport equation using either:
@@ -96,7 +96,10 @@ After starting the software by typing the following command line in a terminal:
 
 A main window (GUI) of the package **NTP-ERSN** an Ubuntu Linux machine will be displayed as in Figure bellow.
 
-[https://github.com/mohamedlahdour/NTP-ERSN/tree/master/doc/_images/gui1.png](http://github.com)
-![Image 0](https://github.com/mohamedlahdour/NTP-ERSN/tree/master/doc/_images/gui1.png)
+![GUI main window](https://github.com/mohamedlahdour/NTP-ERSN/tree/master/doc/_images/gui1.png)
+
+Or we simply type python main.py in the console to launch the package as shown in in Figure bellow.
+
+![NTP-ERSN STANDARD OUTPUT](https://github.com/mohamedlahdour/NTP-ERSN/tree/master/doc/_images/terminal.png)
 
 This software is a free software; you can redistribute it and / or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. For the complete text of the license see the GPL-web page.
