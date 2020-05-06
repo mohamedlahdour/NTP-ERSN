@@ -3,7 +3,7 @@
 In this project we develop a package NTP-ERSN to solve a neutron transport equation.
 
 
-NTP-ERSN (Neutron Transport Package-Equipe Radiations et Systèmes Nucléaires), is an open-source code, developed at the Abdelmalek Essaadi University, Tetouan, Morocco, written by FORTRAN90 for educational purposes to solve the equation of multi-group neutron transport in steady-state using a deterministic approach [Lahdour et al., 2019a](https://doi.org/10.1016/j.apradiso.2018.12.004) such as:
+NTP-ERSN (Neutron Transport Package-[Equipe Radiations et Systèmes Nucléaires](http://ersn.uae.ma/)), is an open-source code, developed at the Abdelmalek Essaadi University, Tetouan, Morocco, written by FORTRAN90 for educational purposes to solve the equation of multi-group neutron transport in steady-state using a deterministic approach [Lahdour et al., 2019a](https://doi.org/10.1016/j.apradiso.2018.12.004) such as:
 
 
 Neutron Transport Package NTP-ERSN(Open Neutron Transport Package from the Radiations and Nuclear Systems Group), is an open-source code written in FORTRAN90 for a pedagogical purpose to solve the steady-state multigroup neutron transport equation using either:
