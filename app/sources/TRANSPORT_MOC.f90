@@ -123,7 +123,7 @@ subroutine Matrix_L(SigS,L,fmmid,ng,Nmat,order,totNFM,dim)
                 k3  = 0
                     do while (k0<k1) 
                              do  i  = 1,totNFM
-                             L(i+k3,i+(k1-1)*totNFM,k4) = SigS(fmmid(i),k4,k0,k1) ! 1 --> 2 SigS(1,1,2)
+                             L(i+k3,i+(k1-1)*totNFM,k4) = SigS(fmmid(i),k4,k1,k0) ! 1 --> 2 SigS(1,1,2)
                              enddo
                              k0 = k0 + 1
                              k3 = k3 + totNFM
@@ -147,7 +147,7 @@ subroutine Matrix_U(SigS,U,fmmid,ng,Nmat,order,totNFM,dim)
                 k3  = 0
                     do while (k0<k1) 
                              do  i  = 1,totNFM
-                             U(i+(k1-1)*totNFM,i+k3,k4) = SigS(fmmid(i),k4,k1,k0) ! 1 --> 2 SigS(1,1,2)
+                             U(i+(k1-1)*totNFM,i+k3,k4) = SigS(fmmid(i),k4,k0,k1) ! 1 --> 2 SigS(1,1,2)
                              enddo
                              k0 = k0 + 1
                              k3 = k3 + totNFM
@@ -180,8 +180,8 @@ subroutine Matrix_F(NusigF,Chi,F,fmmid,ng,Nmat,totNFM,dim)
                 k3  = 0
                     do while (k0<k1) 
                              do  i  = 1,totNFM
-                             F(i+k3,i+(k1-1)*totNFM) =  Chi(fmmid(i),k1)*NusigF(fmmid(i),k0)
-                             F(i+(k1-1)*totNFM,i+k3) =  Chi(fmmid(i),k0)*NusigF(fmmid(i),k1)
+                             F(i+k3,i+(k1-1)*totNFM) =  Chi(fmmid(i),k0)*NusigF(fmmid(i),k1)
+                             F(i+(k1-1)*totNFM,i+k3) =  Chi(fmmid(i),k1)*NusigF(fmmid(i),k0)
                              enddo
                              k0 = k0 + 1
                              k3 = k3 + totNFM
@@ -228,7 +228,7 @@ subroutine flux_guess(dim,ng,Nmat,ngauss,order,totNFM,fmmid,NusigF,Delta,p,flux_
        flux_ni = 1
 end subroutine flux_guess
 !BL10
-subroutine Fission_Source(ng,dim,ngauss,order,totNFM,F,flux_li,p,k_eff,FQ_ni)
+subroutine Fission_Source(ng,dim,ngauss,order,totNFM,F,flux_li,p,k_eff,Q_li,FQ_ni)
        implicit none
        integer(kind=4), intent(in) :: dim,ngauss,ng,totNFM,order
        real(kind=4), intent(in) :: k_eff 
@@ -236,7 +236,8 @@ subroutine Fission_Source(ng,dim,ngauss,order,totNFM,F,flux_li,p,k_eff,FQ_ni)
        real(kind=4), dimension(order,ngauss), intent(in) :: p
        real(kind=4), dimension(dim,order), intent(in) :: flux_li
        real(kind=4), dimension(dim,ngauss*ng), intent(out) :: FQ_ni
-       real(kind=4), dimension(dim,order) :: Q_li,phi_li
+       real(kind=4), dimension(dim,order), intent(out) :: Q_li
+       real(kind=4), dimension(dim,order) :: phi_li
        integer(kind=4) :: i,k0,k1,k2,ll,n,m
        k0=1;k2=1
        phi_li = flux_li
@@ -247,14 +248,14 @@ subroutine Fission_Source(ng,dim,ngauss,order,totNFM,F,flux_li,p,k_eff,FQ_ni)
           enddo
        endif
 
-       Q_li(:,:) = matmul(F(:,:),phi_li(:,:))
+       Q_li(:,:) = matmul(F(:,:),phi_li(:,:))/k_eff
 
        do k1 = 1,ng
           do i =k0,totNFM*k1
               do n = 1,ngauss
                 ll = 0
                 do m = 1,order
-                    FQ_ni(i,n+k2-1) = FQ_ni(i,n+k2-1) + 0.5*(2.*float(ll)+1.)*Q_li(i,m)*p(m,n)/k_eff
+                    FQ_ni(i,n+k2-1) = FQ_ni(i,n+k2-1) + 0.5*(2.*float(ll)+1.)*Q_li(i,m)*p(m,n)
                    ll = ll+1
                 enddo
               enddo   
@@ -580,8 +581,8 @@ subroutine flux_moy(A,B,ng,ngauss,totNFM,dim,curr,flux_ni)
             enddo
 end subroutine flux_moy
 !BL16
-subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,wt,mu,D,F,U,L,p,BC,scheme,fmmid,&
-                        SigT,flux_ni,flux_li,Delta,k_eff,phi)
+subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,wt,mu,D,F,U,L,p,BC,&
+                          scheme,fmmid,SigT,sigF,Delta,k_eff,phi)
        implicit none
        integer(kind=4), intent(in) :: ng,dim,totNFM,ngauss,order,Nmat,Max_it
        integer(kind=4), dimension(totNFM), intent(in) :: fmmid 
@@ -589,25 +590,22 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
        real(kind=4), dimension(totNFM), intent(in) :: Delta
        real(kind=4), dimension(dim ,dim), intent(in) :: F
        real(kind=4), dimension(order,ngauss), intent(in) :: p
-       real(kind=4), dimension(Nmat,ng), intent(in) :: SigT
+       real(kind=4), dimension(Nmat,ng), intent(in) :: SigT,sigF
        real(kind=4), dimension(dim,dim,order), intent(in) :: D,U,L
        real(kind=4), intent(in) :: eps
-       real(kind=4), dimension(dim,ngauss*ng), intent(inout) :: flux_ni
-       real(kind=4), dimension(dim,order), intent(inout) :: flux_li
        real(kind=4), dimension(dim), intent(out) :: phi
        real(kind=4), intent(out) :: k_eff
        integer(kind=4), intent(out) :: it,inter
 !      variables locale
-       real(kind=4), dimension(dim,ngauss*ng) :: A,B
-       real(kind=4), dimension(dim,ngauss*ng) :: Q_ni,SQ_ni,flux0,flux00,flux,FQ_ni
+       real(kind=4), dimension(dim,ngauss*ng) :: A,B,flux_ni
+       real(kind=4), dimension(dim,ngauss*ng) :: Q_ni,SQ_ni,flux,FQ_ni
        real(kind=4), dimension((totNFM+1)*ng,ngauss*ng) :: curr
-       real(kind=4), dimension(dim,order) :: flux_li0
+       real(kind=4), dimension(dim,order) ::  flux_li, Q_li,flux_li0,flux_li1
        real(kind=4), dimension(ng) :: moy 
-       real(kind=4) :: err_k_eff, err_phi, k_eff0, eval1, eval2,Del,Sig,muu,err_flux
+       real(kind=4) :: err_k_eff,err_phi,k_eff0,Del,Sig,muu,err_flux,norme,dsnew,dsold,err2,err1 
        integer(kind=4) :: i,n,k0,k2,k1
-       CHARACTER(50), intent(in) :: BC, scheme
+       CHARACTER(50), intent(in) :: BC,scheme
 !      convergence parameters
-       inter=0
        err_k_eff = 1.0
        err_phi = 1.0
        err_flux = 1.5
@@ -616,31 +614,28 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
 !      the positive flux condition
        Del = minval(Delta)
        Sig = minval(SigT)
-       muu = minval(mu) 
-       
+       muu = minval(mu)
+       call flux_guess(dim,ng,Nmat,ngauss,order,totNFM,fmmid,sigF,Delta,p,flux_ni,flux_li)
        if (Del*Sig > 2*abs(muu)) then
           print*,'Failed the positive flux condition.'
           stop
           endif 
-       
-       flux_li0 = flux_li
-       flux0    = abs(flux_ni)  
-       flux00   = abs(flux_ni)
-            
+       call Fission_Source(ng,dim,ngauss,order,totNFM,F,flux_li,p,k_eff,Q_li,FQ_ni)
+       dsold = sum(Q_li)
+        
        do while ( err_k_eff >= eps .and. err_phi >= eps )
-                 flux0 = abs(flux_ni)
-                 call Fission_Source(ng,dim,ngauss,order,totNFM,F,flux_li,p,k_eff,FQ_ni)
                  if (it >= Max_it) then
                  print*,'Failed to converge.'
                  stop
                  endif 
-                 flux = 0.0
+                 flux_li1 = flux_li
                  k_eff0 = k_eff
                  err_flux = 1.5
-! Staring intern Iteration
-! ==============================================================================
-             do  while (  err_flux >= 0.0001 )
-                 
+                 inter=0   
+!      Staring intern Iteration
+!      ==============================================================================
+             do  while ( err_flux >= eps*10 )
+                 flux_li0 = flux_li
                  call Scattering_Source(ng,dim,ngauss,order,totNFM,D,U,L,flux_li,p,SQ_ni)
                  call Total_Source(ng,dim,ngauss,FQ_ni,SQ_ni,Q_ni)
                  call Matrix_AB(ng,Nmat,dim,totNFM,ngauss,mu,fmmid,SigT,Delta,Q_ni,A,B)
@@ -665,43 +660,31 @@ subroutine Outer_Iteration(ng,dim,Max_it,totNFM,ngauss,order,Nmat,it,inter,eps,w
                        k0 = k0 + totNFM
                        k2 = k2 + ngauss
                  enddo
-
-                 flux =  flux + abs(flux_ni)  
-                 err_flux = maxval(abs(flux-flux0)/flux0)
-                 flux0 = flux 
+                 err1   = maxval(abs(flux_li0))
+                 err2   = maxval(abs(flux_li-flux_li0))
+                 err_flux = err2/err1 
                  inter = inter + 1 
+                 if (inter>1000) exit 
              enddo
-! ending intern Iteration 
-!==============================================================================
-             err_phi =  maxval(abs(abs(flux_ni)-flux00)/flux00)
+!      ending intern Iteration 
+!      ==============================================================================
+             err1   = maxval(abs(flux_li1))
+             err2   = maxval(abs(flux_li-flux_li1))
+             err_phi =  err2/err1
              it = it + 1     
-             eval1=sum(matmul(F, flux_li(:,1)))
-             eval2=sum(matmul(F, flux_li0(:,1)))
-             k_eff = k_eff*(eval1/eval2)
-             err_k_eff =  abs(k_eff-k_eff0)/k_eff
+             call Fission_Source(ng,dim,ngauss,order,totNFM,F,flux_li,p,k_eff,Q_li,FQ_ni)
+             !Normalised Source
+             call NormalizeFlux(dim,totNFM,Nmat,ng,sigF,fmmid,delta,flux_li(:,1)) 
+             !norme = sqrt(sum(flux_li*flux_li))
+             !flux_li = flux_li/norme
+             dsnew = sum(Q_li)
+             k_eff =  k_eff*dsnew/dsold
+             err_k_eff =  abs(k_eff-k_eff0)/k_eff0
+             if (it>500) exit 
              write(*,2000)it,k_eff,err_k_eff  
-             flux_li0 = flux_li
-             flux00   = abs(flux_ni)
+             dsold = dsnew
        end do  
-             phi = 0.0
-                 k0 = 1
-                 k2 = 1
-                 do k1 = 1,ng
-                    do i  = k1*totNFM,k0,-1
-                       do n = 1,(ngauss/2)
-                          phi(i) = phi(i) + wt(n)*abs(flux_ni(i,n+k2-1))
-                       enddo
-                    enddo 
-
-                    do i = k0,totNFM*k1
-                       do n = ngauss,(ngauss/2)+1,-1
-                           phi(i) =  phi(i) + wt(n)*abs(flux_ni(i,n+k2-1))
-                       enddo
-                    enddo
-                       k0 = k0 + totNFM
-                       k2 = k2 + ngauss
-                 enddo
-
+             phi = flux_li(:,1)
        2000 format(t3,"Iteration",i4,":",5x,"===>",5x,"keff =",F9.6,5x,"===>",5x,"res =",e10.3)
 end subroutine Outer_Iteration
 !BL17
@@ -829,10 +812,9 @@ subroutine plot_flux(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na,Delta,assembly,nf
                 n=n+1  
              enddo
         enddo
-
         som = Delta(1)
-        do i=1,totNFM
-        write(10,*) som,(flux(i+j),j=0,dim-1,totNFM)
+        do i=2,totNFM
+        write(10,*) som,(flux(i+j-1),j=0,dim-1,totNFM)
         som = som + Delta(i)
         enddo
         close(10)
@@ -961,7 +943,7 @@ end subroutine timestamp
        do i=1,nx
              do k =1,nxx
                 do l=1,sum(nfmesh(assembly(core(i),k),:))
-                   PF0(n) = PF0(n) + delta(n1)*sum(sigF(fmmid(n1),:)*flux(n1,:))
+                   PF0(n) = PF0(n) + sum(delta(n1)*sigF(fmmid(n1),:)*flux(n1,:))
                    n1=n1+1
                 enddo
               n=n+1
@@ -971,6 +953,7 @@ end subroutine timestamp
        pm  = sum(PF0)/float(napc)
        PF  = PF0/pm
     end subroutine PowerPF
+!BLOC17
     subroutine ScalarFluxPinC(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,na,nfmesh,delta,assembly,phi,core,SFPC)
     ! CALCULATION OF SCALAR FLUX IN EACH PIN CELL
        integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng,nx,nxx,npx,npc,na
@@ -991,30 +974,27 @@ end subroutine timestamp
              n=n+1
           enddo
        enddo
-
        n=1;n1=1
        do i=1,nx
              do k =1,nxx  
                 do l=1,sum(nfmesh(assembly(core(i),k),:))
-                   SFPC(n,:) = SFPC(n,:) + delta(n1)*flux(n1,:)
+                   SFPC(n,:) = SFPC(n,:) + flux(n1,:)
                    n1=n1+1
                 enddo
               n=n+1
              enddo
        enddo
-       SFPC = SFPC/sum(delta)
        do i=1,nx*nxx
           write(10,*) (SFPC(i,j),j=1,ng)
        enddo
        close(10)
     end subroutine ScalarFluxPinC
-
-!BLOC15
-    subroutine NormalizeFlux(dim,totNFM,Nmat,ng,NusigF,Chi,fmmid,delta,phi) 
+!BLOC18
+    subroutine NormalizeFlux(dim,totNFM,Nmat,ng,sigF,fmmid,delta,phi) 
     implicit none
-    ! Neutron scalar flux is normalized according to sum(V*Chi*NusigF*phi=1)
+    ! Neutron scalar flux is normalized according to sum(V*sigF*phi)/Vt=1
     integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng
-    real(kind=4), dimension(Nmat,ng), intent(in) :: NusigF,Chi
+    real(kind=4), dimension(Nmat,ng), intent(in) :: sigF
     real(kind=4), dimension(totNFM), intent(in) :: delta
     integer(kind=4), dimension(totNFM), intent(in) :: fmmid
     real(kind=4), dimension(dim), intent(inout) :: phi
@@ -1029,17 +1009,12 @@ end subroutine timestamp
              n=n+1
           enddo
        enddo
-    norme = 0.0
-    ! Normalized source
-    do k=1,ng      
-          do i = 1,totNFM
-             a1 = Chi(fmmid(i),k)*sum(NusigF(fmmid(i),:)*flux(i,:))   
-             a2 = delta(i)*delta(i)
-             a3 = a1*a1
-             norme = norme  + sqrt(a2*a3)
-          enddo
+    ! Normalized source     
+    do i = 1,totNFM
+        a1 = sum(flux(i,:)*delta(i)*sigF(fmmid(i),:))
+        norme = norme  + sqrt(a1*a1)
     enddo
-    flux = sum(delta)*flux/norme
+    flux = sum(delta)*(flux/norme)
     n=1
        do i=1,ng
           do j=1,totNFM
@@ -1048,6 +1023,3 @@ end subroutine timestamp
           enddo
        enddo
     end subroutine NormalizeFlux
-
-
-

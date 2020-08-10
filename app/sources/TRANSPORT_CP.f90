@@ -361,7 +361,7 @@
                 k3  = 0
                     do while (k0<k1) 
                              do  i  = 1,totNFM
-                             L(i+k3,i+(k1-1)*totNFM) = SigS(fmmid(i),k0,k1) ! 1 --> 2 SigS(1,1,2)
+                             L(i+k3,i+(k1-1)*totNFM) = SigS(fmmid(i),k1,k0) ! 1 --> 2 SigS(1,1,2)
                              enddo
                              k0 = k0 + 1
                              k3 = k3 + totNFM
@@ -383,7 +383,7 @@
                 k3  = 0
                     do while (k0<k1) 
                              do  i  = 1,totNFM
-                             U(i+(k1-1)*totNFM,i+k3) = SigS(fmmid(i),k1,k0) ! 1 --> 2 SigS(1,1,2)
+                             U(i+(k1-1)*totNFM,i+k3) = SigS(fmmid(i),k0,k1) ! 1 --> 2 SigS(1,1,2)
                              enddo
                              k0 = k0 + 1
                              k3 = k3 + totNFM
@@ -415,8 +415,8 @@
                 k3  = 0
                     do while (k0<k1) 
                              do  i  = 1,totNFM
-                             F(i+k3,i+(k1-1)*totNFM) =  CHI(fmmid(i),k1)*NusigF(fmmid(i),k0)
-                             F(i+(k1-1)*totNFM,i+k3) =  CHI(fmmid(i),k0)*NusigF(fmmid(i),k1)
+                             F(i+k3,i+(k1-1)*totNFM) =  CHI(fmmid(i),k0)*NusigF(fmmid(i),k1)
+                             F(i+(k1-1)*totNFM,i+k3) =  CHI(fmmid(i),k1)*NusigF(fmmid(i),k0)
                              enddo
                              k0 = k0 + 1
                              k3 = k3 + totNFM
@@ -433,14 +433,17 @@
        B(:,:)   = matmul(W,F)
     end subroutine Matrix_AB
 !BL17
-    subroutine aleig(a,b,eps,iter,eval,phi,phi_guess,ng,totNFM,Max_it,dim)
+    subroutine aleig(a,b,eps,iter,eval,phi,phi_guess,sigF,fmmid,delta,ng,totNFM,Max_it,Nmat,dim)
 !      -------------------  The inverse power method  -------------------
 !                           (A - 1/Keff*B)*phi = 0
 ! 
 !      ------------------------------------------------------------------
        implicit none
-       integer(kind=4), intent(in) :: ng,totNFM,Max_it,dim
+       integer(kind=4), intent(in) :: ng,totNFM,Max_it,Nmat,dim    
        real(kind=4), intent(in) :: eps
+       real(kind=4), dimension(Nmat,ng), intent(in) :: sigF
+       real(kind=4), dimension(totNFM), intent(in) :: delta
+       integer(kind=4), dimension(totNFM), intent(in) :: fmmid
        real(kind=4), dimension(dim,dim), intent(in) :: a,b
        real(kind=4), dimension(dim), intent(in) :: phi_guess
        real(kind=4), dimension(dim), intent(out) :: phi
@@ -449,15 +452,13 @@
        real(kind=4), dimension(dim,dim) :: ai,ainv
        real(kind=4), dimension(dim) :: gar,vec1,vec2
        real(kind=4), dimension(dim) :: phi1,phi2
-       real(kind=4), dimension(ng) :: moy
        real(kind=4) :: s1,s2,err1,err2,test,eval1,eval2,epsil1=1.0,epsil2=1.0
-       integer(kind=4) :: i,k0,k1
        call matinv(a,ainv,dim)
        ai = matmul(ainv,b)
        iter = 0
        phi1 = phi_guess
        eval1 = 0.0
-       do while ( epsil1 >= eps .and. epsil2 >= eps )       
+       do while ( epsil1 >= eps .and. epsil2 >= eps*10 )       
            iter = iter + 1
            if ( iter > Max_it ) then
            print*, 'error(unable to converge(1))'
@@ -482,25 +483,13 @@
                    test = epsil1
            elseif (iter >= 10 .and. epsil1 > test) then
            print*, 'error(unable to converge(2) )'
-           print*, 'because error in iteration ten is sup to one'
+           print*, 'because the error in iteration ten is sup to one'
            end if
            phi = phi1
            eval = eval1
            write(*,'(t3,"Iteration",i4,":",5x,"===>",5x,"keff =",F9.6,5x,"===>",5x,"res =",e10.3)')iter,1/eval,epsil1
        end do
-
-       moy = 0.0
-       k1 = 1
-       do k0 = 1,ng
-          do i=k1,totNFM*k0
-             moy(k0) = moy(k0) + phi(i)
-          end do
-          do i=k1,totNFM*k0
-             phi(i) = phi(i)/(moy(k0)/totNFM)
-          end do
-          k1 = k1 + totNFM 
-       enddo
-
+       call NormalizeFlux(dim,totNFM,Nmat,ng,sigF,fmmid,delta,phi) 
     end subroutine aleig
 !BL18
     subroutine vol_ray(entree,nfmesh,rayon,ray,vol,nregion,totNFM)
@@ -732,80 +721,37 @@ end subroutine Output
        write ( *, FMT=* )' ************************************************************************'  
     end subroutine title2
 !BL24
-subroutine plot_flux(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na,Delta,assembly,nfmesh,flux,fmmid,core,sigF)
+subroutine Plot_flux(dim,totNFM,Nmat,ng,nx,nxx,napc,Delta,phi,SFPC,SF)
         implicit none
-        integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na
-        real(kind=4), dimension(Nmat,ng), intent(in) :: sigF
-        integer(kind=4), dimension(totNFM), intent(in) :: fmmid
-        integer(kind=4), dimension(npc,npx), intent(in) ::  nfmesh
+        integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng,nx,nxx,napc
         real(kind=4), dimension(totNFM), intent(in) :: delta
-        integer(kind=4), dimension(na,nxx), intent(in) :: assembly
-        integer(kind=4), dimension(nx), intent(in) :: core
-        real(kind=4), dimension(dim), intent(in) :: flux
+        real(kind=4), dimension(dim), intent(in) :: phi
+        real(kind=4), dimension(nx*nxx,ng), intent(in) :: SFPC,SF
         real(kind=4), dimension(nx*nxx) :: PF
         real(kind=4) :: som,val
-        integer(kind=4) :: i,j,k,n
+        integer(kind=4) :: i,j,n
         open (10,file='app/Output/FLUX_CP.H')
         open (11,file='app/Output/PF_CP.H')
-        call PowerPF(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na,Delta,assembly,nfmesh,flux,core,fmmid,sigF,PF)
+        call PowerPF(totNFM,Nmat,ng,nx,nxx,napc,SFPC,SF,PF)
         n=1;val=0.
         write(11,*) val
         do i = 1,nx
-             do k=1,nxx
+             do j=1,nxx
                 write(11,*) PF(n)
                 n=n+1  
              enddo
         enddo
-
         som = Delta(1)
-        do i=1,totNFM
-        write(10,*) som,(flux(i+j),j=0,dim-1,totNFM)
+        do i=2,totNFM
+        write(10,*) som,(phi(i+j-1),j=0,dim-1,totNFM)
         som = som + Delta(i)
         enddo
         close(10)
         close(11)
-end subroutine plot_flux
-!BL25
-    subroutine PowerPF(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na,Delta,assembly,nfmesh,phi,core,fmmid,sigF,PF)
-    ! CALCULATION OF POWER PEAKING FACTOR
-       implicit none
-       integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng,nx,nxx,npx,npc,napc,na
-       real(kind=4), dimension(Nmat,ng), intent(in) :: sigF
-       integer(kind=4), dimension(totNFM), intent(in) :: fmmid
-       integer(kind=4), dimension(npc,npx), intent(in) ::  nfmesh
-       real(kind=4), dimension(totNFM), intent(in) :: delta
-       integer(kind=4), dimension(na,nxx), intent(in) :: assembly
-       real(kind=4), dimension(dim), intent(in) :: phi
-       integer(kind=4), dimension(nx), intent(in) :: core
-       real(kind=4), dimension(nx*nxx), intent(out) :: PF
-       real(kind=4), dimension(totNFM,ng) :: flux
-       real(kind=4), dimension(nx*nxx) :: PF0
-       real(kind=4) :: pm
-       integer(kind=4) :: i,j,k,l,n,n1
-       n=1
-       do i=1,ng
-          do j=1,totNFM
-             flux(j,i)=phi(n)
-             n=n+1
-          enddo
-       enddo
-       PF0 = 0.0; PF = 0.0
-       n=1;n1=1
-       do i=1,nx
-             do k =1,nxx
-                do l=1,sum(nfmesh(assembly(core(i),k),:))
-                   PF0(n) = PF0(n) + delta(n1)*sum(sigF(fmmid(n1),:)*flux(n1,:))
-                   n1=n1+1
-                enddo
-              n=n+1
-             enddo
-       enddo
-       PF0 = PF0/sum(delta)
-       pm  = sum(PF0)/float(napc)
-       PF  = PF0/pm
-    end subroutine PowerPF
-!BL26
-    subroutine ScalarFluxPinC(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,na,nfmesh,delta,assembly,phi,core,SFPC)
+end subroutine Plot_flux
+!BL
+    subroutine ScalarFluxPinC(dim,totNFM,Nmat,ng,nx,nxx,npx,npc,na,nfmesh,delta,&
+                              assembly,phi,sigF,fmmid,core,SFPC,SF)
     ! CALCULATION OF SCALAR FLUX IN EACH PIN CELL
        integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng,nx,nxx,npx,npc,na
        integer(kind=4), dimension(npc,npx), intent(in) ::  nfmesh
@@ -813,7 +759,9 @@ end subroutine plot_flux
        integer(kind=4), dimension(na,nxx), intent(in) :: assembly
        real(kind=4), dimension(dim), intent(in) :: phi
        integer(kind=4), dimension(nx), intent(in) :: core
-       real(kind=4), dimension(nx*nxx,ng), intent(out) :: SFPC
+       real(kind=4), dimension(Nmat,ng), intent(in) :: sigF
+       integer(kind=4), dimension(totNFM), intent(in) :: fmmid
+       real(kind=4), dimension(nx*nxx,ng), intent(out) :: SFPC,SF
        real(kind=4), dimension(totNFM,ng) :: flux
        integer(kind=4) :: i,j,k,l,n,n1
        real(kind=4) :: som
@@ -825,22 +773,79 @@ end subroutine plot_flux
              n=n+1
           enddo
        enddo
-
-       n=1;n1=1
+       SFPC=0;SF=0   
+       do j=1,ng
+          n=1;n1=1
        do i=1,nx
              do k =1,nxx  
                 do l=1,sum(nfmesh(assembly(core(i),k),:))
-                   SFPC(n,:) = SFPC(n,:) + delta(n1)*flux(n1,:)
+                   SFPC(n,j) =  SFPC(n,j) + flux(n1,j) 
+                   SF(n,j)   =  SF(n,j)   + sigF(fmmid(n1),j)*flux(n1,j)!*delta(n1)
                    n1=n1+1
                 enddo
               n=n+1
              enddo
        enddo
-       SFPC = SFPC/sum(delta)
+       enddo
        do i=1,nx*nxx
           write(10,*) (SFPC(i,j),j=1,ng)
        enddo
        close(10)
     end subroutine ScalarFluxPinC
+!BLOC16
+    subroutine PowerPF(totNFM,Nmat,ng,nx,nxx,napc,SFPC,SF,PF)
+    ! CALCULATION OF POWER PEAKING FACTOR
+       implicit none
+       integer(kind=4), intent(in) :: totNFM,Nmat,ng,nx,nxx,napc
+       real(kind=4), dimension(nx*nxx,ng), intent(in) :: SFPC,SF
+       real(kind=4), dimension(nx*nxx), intent(out) :: PF
+       real(kind=4), dimension(nx*nxx) :: PF0
+       real(kind=4) :: pm
+       integer(kind=4) :: i,j,n
+       PF0 = 0.0
+       n=1
+       do i=1,nx
+          do j =1,nxx
+             PF0(n) =  sum(SF(n,:))
+             n=n+1
+          enddo
+       enddo
+       pm  = sum(PF0)/float(napc)
+       PF  = PF0/pm
+    end subroutine PowerPF
+!BLOC17
+    subroutine NormalizeFlux(dim,totNFM,Nmat,ng,sigF,fmmid,delta,phi) 
+    implicit none
+    ! Neutron scalar flux is normalized according to sum(V*NusigF*phi=1)
+    integer(kind=4), intent(in) :: dim,totNFM,Nmat,ng
+    real(kind=4), dimension(Nmat,ng), intent(in) :: sigF
+    real(kind=4), dimension(totNFM), intent(in) :: delta
+    integer(kind=4), dimension(totNFM), intent(in) :: fmmid
+    real(kind=4), dimension(dim), intent(inout) :: phi
+    real(kind=4), dimension(totNFM,ng) :: flux
+    integer(kind=4) :: i,j,k,n
+    real(kind=4) :: norme,a1,a2,a3
+    ! Initialize local variables
+    n=1
+       do i=1,ng
+          do j=1,totNFM
+             flux(j,i)=phi(n)
+             n=n+1
+          enddo
+       enddo
+    ! Normalized source     
+    do i = 1,totNFM
+        a1 = sum(flux(i,:)*delta(i)*sigF(fmmid(i),:))
+        norme = norme  + sqrt(a1*a1)
+    enddo
+    flux = sum(delta)*(flux/norme)
+    n=1
+       do i=1,ng
+          do j=1,totNFM
+             phi(n) = flux(j,i)
+             n=n+1
+          enddo
+       enddo
+    end subroutine NormalizeFlux
 
  

@@ -7,19 +7,20 @@
 #sudo apt-get upgrade
 #echo "UPGRADE COMPLETED !"
 
+
+conda create -n py3k anaconda python=3.8
 echo "--- installing the prerequisistes"  
 # Python
-sudo apt-get install python-tk
+sudo apt-get install python3.8
+sudo apt-get install python3-tk
 echo "Tkinter INSTALLATIO COMPLETED !"
-sudo apt-get install python-pip
-pip install pygmyplot
-pip install image
+sudo apt-get install python3-pip
+pip3 install image
 sudo apt-get install gfortran
 echo "FORTRAN INSTALLATION COMPLETED !"
-sudo apt install python-numpy
-pip install pygame
-sudo apt-get install python-opengl
-sudo apt-get install python-matplotlib
+sudo apt install python3-numpy
+sudo apt-get install python3-opengl
+pip3 install matplotlib
  
 echo "              *************************************************  "
 echo "                         INSTALLATION was COMPLETED              "

@@ -8,7 +8,7 @@
       "Total number of assemblies": 1,
       "Total number of active pin cells": 1,
       "Core":[1],
-      "Number of angular discretizations": 2,
+      "Number of angular discretizations": 6,
       "The l-order Legendre polynomial": 0,
       "Maximum number of iterations": 200,
       "Criterion of Keff convergence": 1.0e-5
@@ -43,6 +43,7 @@
     ]
   }
 }
+
 
 
 

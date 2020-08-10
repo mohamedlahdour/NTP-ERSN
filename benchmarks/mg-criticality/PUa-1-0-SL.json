@@ -10,7 +10,6 @@
       "Core":[1],
       "Number of angular discretizations": 20,
       "The l-order Legendre polynomial": 0,
-      "Boundary conditions": "vacuum",
       "Maximum number of iterations": 200,
       "Criterion of Keff convergence": 1.0e-5
     },
@@ -42,6 +41,7 @@
     ]
   }
 }
+
 
 
 

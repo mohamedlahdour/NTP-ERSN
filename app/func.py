@@ -1,14 +1,14 @@
-#!usr/bin/python
+#!usr/bin/python3
 # -*- coding: utf-8 -*-
 import os
 import os.path
 import sys
 import subprocess
-import tkFileDialog
-import tkMessageBox
+from tkinter import filedialog
+from tkinter import messagebox
 import shutil
-import ttk
-from Tkinter import *
+from tkinter import ttk 
+from tkinter import *
 import matplotlib.pyplot as plt
 import numpy 
 import numpy as np
@@ -16,6 +16,9 @@ import json
 import matplotlib.patches as mpatch
 import matplotlib.patches as mpatches
 import matplotlib.mlab as mlab
+import shlex
+from threading import Thread
+from queue import Queue, Empty
 #from playsound import 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 def new1(self):
@@ -28,11 +31,11 @@ def new1(self):
     M00 = open('app/link/script01.py', "r" ).read() 
     if M00 == 'Pin Cell':
         if  self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter Enter the materials number")
+            messagebox.showwarning("Warning", "Enter Enter the materials number")
         elif self.np == 0:
-            tkMessageBox.showwarning("Warning", "Enter the pin cells number")
+            messagebox.showwarning("Warning", "Enter the pin cells number")
         elif self.nx == 0:
-            tkMessageBox.showwarning("Warning", "Enter the x mesh pin cell number \n"+
+            messagebox.showwarning("Warning", "Enter the x mesh pin cell number \n"+
                                      "(Each pin cell is approximated by a x cartesian grid)")
         elif self.np != 0 and self.nx != 0 and self.nmat != 0:
 
@@ -94,15 +97,14 @@ def new1(self):
                     self.ent3[m3].delete(0,'end') 
                     self.ent3[m3].insert(0,self.NFMR[m3])
                     m3+=1
-            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save1)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton = ttk.Button(self.newWindow,text="Save and Close", style='BW.TButton', command=self.save1)
             self.bouton.pack(fill="x", expand="yes")
  
     elif M00 == 'Assembly':
         if  self.na  == 0:
-            tkMessageBox.showwarning("Warning", "Enter the assemblies number")
+            messagebox.showwarning("Warning", "Enter the assemblies number")
         elif  self.nxa  == 0:
-            tkMessageBox.showwarning("Warning", "Enter the x mesh assembly number \n"+
+            messagebox.showwarning("Warning", "Enter the x mesh assembly number \n"+
                                        "(Each assembly contains a set of pin cells)")
         elif self.na != 0 and self.nxa !=0:
             self.newWindow = Toplevel()
@@ -136,12 +138,11 @@ def new1(self):
                     self.ent4[m].insert(0,self.assm[m])
                     m+=1
 
-            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save2)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton = ttk.Button(self.newWindow,text="Save and Close", style='BW.TButton', command=self.save2)
             self.bouton.pack(fill="x", expand="yes") 
     elif M00 == 'Core':
         if self.na == 0:
-            tkMessageBox.showwarning("Warning", "Enter the assemblies number")
+            messagebox.showwarning("Warning", "Enter the assemblies number")
         elif self.na != 0:
             self.newWindow = Toplevel()
             self.newWindow.grab_set()
@@ -165,8 +166,7 @@ def new1(self):
                 self.ent5[j].delete(0,'end') 
                 self.ent5[j].insert(0,self.core[j])
 
-            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save3)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton = ttk.Button(self.newWindow,text="Save and Close", style='BW.TButton', command=self.save3)
             self.bouton.pack(fill="x", expand="yes") 
 
   
@@ -179,9 +179,9 @@ def new2(self):
     M00 = open('app/link/script02.py', "r" ).read() 
     if M00 == 'TotalXS':
         if  self.ng == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+            messagebox.showwarning("Warning", "Enter the number of energy group")
         elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of materials")
+            messagebox.showwarning("Warning", "Enter the number of materials")
         else:
             self.newWindow = Toplevel()
             self.newWindow.grab_set()
@@ -207,15 +207,14 @@ def new2(self):
                     self.ent6[m].delete(0,'end')
                     self.ent6[m].insert(0,self.SigT[m])
                     m+=1
-            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save4)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton = ttk.Button(self.newWindow,text="Save and Close", style='BW.TButton', command=self.save4)
             self.bouton.pack(fill="x", expand="yes") 
 
     elif M00 == 'FissionXS':
         if  self.ng == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+            messagebox.showwarning("Warning", "Enter the number of energy group")
         elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of materials")
+            messagebox.showwarning("Warning", "Enter the number of materials")
         else:
             self.newWindow = Toplevel()
             self.newWindow.grab_set()
@@ -241,15 +240,14 @@ def new2(self):
                     self.ent7[m].delete(0,'end')
                     self.ent7[m].insert(0,self.SigF[m])
                     m+=1
-            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save5)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton = ttk.Button(self.newWindow,text="Save and Close", style='BW.TButton', command=self.save5)
             self.bouton.pack(fill="x", expand="yes") 
 
     elif M00 == 'NuFissionXS':
         if  self.ng == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+            messagebox.showwarning("Warning", "Enter the number of energy group")
         elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of materials")
+            messagebox.showwarning("Warning", "Enter the number of materials")
         else:
             self.newWindow = Toplevel()
             self.newWindow.grab_set()
@@ -276,15 +274,14 @@ def new2(self):
                     self.ent8[m].delete(0,'end')
                     self.ent8[m].insert(0,self.NuSigF[m])
                     m=m+1
-            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save6)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton = ttk.Button(self.newWindow,text="Save and Close", style='BW.TButton', command=self.save6)
             self.bouton.pack(fill="x", expand="yes") 
 
     elif M00 == 'ScatterMatrixXS':
         if  self.ng == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+            messagebox.showwarning("Warning", "Enter the number of energy group")
         elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of materials")
+            messagebox.showwarning("Warning", "Enter the number of materials")
         else:
             self.newWindow = Toplevel()
             self.newWindow.grab_set()
@@ -326,15 +323,14 @@ def new2(self):
                             m2+=1 
                         m+=1
                     m1+=1
-            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save7)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton = ttk.Button(self.newWindow,text="Save and Close", style='BW.TButton', command=self.save7)
             self.bouton.pack(fill="x", expand="yes") 
 
     elif M00 == 'ChiXS':
         if  self.ng == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+            messagebox.showwarning("Warning", "Enter the number of energy group")
         elif self.nmat == 0:
-            tkMessageBox.showwarning("Warning", "Enter the number of materials")
+            messagebox.showwarning("Warning", "Enter the number of materials")
         else:
             self.newWindow = Toplevel()
             self.newWindow.grab_set()
@@ -361,8 +357,7 @@ def new2(self):
                     self.ent10[m].delete(0,'end')
                     self.ent10[m].insert(0,self.Chi[m])
                     m=m+1
-            self.bouton = Button(self.newWindow,text="Save and Close", font='Times', command=self.save8)
-            self.bouton.config(bg='white', fg='black', relief='raised',borderwidth=4)
+            self.bouton = ttk.Button(self.newWindow,text="Save and Close", style='BW.TButton', command=self.save8)
             self.bouton.pack(fill="x", expand="yes") 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -550,8 +545,8 @@ def Draw(self):
         plt.show()
 
 def exit_editor(self):
-        if tkMessageBox.askokcancel("Quit", "Do you really want to quit?"):
-            self.root.destroy()
+    if messagebox.askokcancel("Quit", "Do you really want to quit?"):
+        self.root.destroy()
 def data_up(self,event=None):
     self.ng    = int(self.ent0[0].get())
     self.nmat  = int(self.ent0[1].get())
@@ -561,20 +556,19 @@ def data_up(self,event=None):
     self.na    = int(self.ent0[5].get())
     self.order = int(self.ent0[8].get())+1
     if self.ng == 0:
-        tkMessageBox.showwarning("Warning", "Enter the number of energy group")
+        messagebox.showwarning("Warning", "Enter the number of energy group")
     elif self.nmat == 0:
-        tkMessageBox.showwarning("Warning", "Enter the number of materials")
+        messagebox.showwarning("Warning", "Enter the number of materials")
     elif self.np == 0:
-        tkMessageBox.showwarning("Warning", "Enter the pin cells number")
+        messagebox.showwarning("Warning", "Enter the pin cells number")
     elif self.nx == 0:
-        tkMessageBox.showwarning("Warning", "Enter the x mesh pin cell number \n"+
+        messagebox.showwarning("Warning", "Enter the x mesh pin cell number \n"+
                                  "(Each pin cell is approximated by a x cartesian grid)")  
     else:
         global filename  # 
         filename = open("app/input/input.json",'w')
         open('app/link/script.dir', "w" ).write(os.path.abspath(os.path.dirname( __file__)) +'/input/input.json')
         PATH = open(os.getcwd()+'/app/link/script.dir', "r" ).read()
-        print PATH
         self.root.title(os.path.basename(PATH) + '- Sotution of the Transport Equation'
             ' by Multigroup Methods')
         filename.write('{ \n  "data": { \n    "parameter": { \n      "id": 100,')
@@ -631,286 +625,251 @@ def data_up(self,event=None):
 
 
 def on_find(self,event=None):
-        t2 = Toplevel(self.root)
-	t2.title('Find')
-	t2.geometry('350x65+200+250')
-	t2.transient(self.root)
-	Label(t2,text="Find All:").grid(row=0, column=0, pady=4, sticky='e')
-	v=StringVar()
-	e = Entry(t2, width=25, textvariable=v)
-	e.grid(row=0, column=1, padx=2, pady=4, sticky='we')
-	c=IntVar()
-	a0 = Checkbutton(t2, text='Ignore Case', variable=c)
-        a0.grid(row=1, column=1, sticky='e', padx=2, pady=2)
-	a1 = Button(t2, text='Find All', underline=0,
-                    command=lambda:self.search_for(v.get(), c.get(), self.textPad, t2, e))
-        a1.grid(row=0, column=2, sticky='e'+'w', padx=2, pady=4)
-	def close_search():
-		self.textPad.tag_remove('match', '1.0', END)
-		t2.destroy()
-	t2.protocol('WM_DELETE_WINDOW', close_search)
+    t2 = Toplevel(self.root)
+    t2.title('Find')
+    t2.geometry('350x65+200+250')
+    t2.transient(self.root)
+    Label(t2,text="Find All:").grid(row=0, column=0, pady=4, sticky='e')
+    v=StringVar()
+    e = Entry(t2, width=25, textvariable=v)
+    e.grid(row=0, column=1, padx=2, pady=4, sticky='we')
+    c=IntVar()
+    a0 = Checkbutton(t2, text='Ignore Case', variable=c)
+    a0.grid(row=1, column=1, sticky='e', padx=2, pady=2)
+    a1 = Button(t2, text='Find All', underline=0,command=lambda:self.search_for(v.get(), c.get(), self.textPad, t2, e))
+    a1.grid(row=0, column=2, sticky='e'+'w', padx=2, pady=4)
+    def close_search():
+        self.textPad.tag_remove('match', '1.0', END)
+        t2.destroy()
+    t2.protocol('WM_DELETE_WINDOW', close_search)
 
 def new_file(self,event=None):
-        global filename
-        filename = None
-        self.root.title("data")
-        self.textPad.delete(1.0, END)
-        self.update_line_number()
+    global filename
+    filename = None
+    self.root.title("data")
+    self.textPad.delete(1.0, END)
+    self.update_line_number()
 
 def open_file(self,event=None):
-        global filename
-        filename = tkFileDialog.askopenfilename(defaultextension=".json",
-                filetypes=[("All Files","*.*"),("Text Documents","*.txt")])
-        open('app/link/script.dir', "w" ).write(str(filename))
-        if filename == "": # If no file chosen.
-            filename = None # Absence of file.
-        else:
-            self.root.title(os.path.basename(filename)) # Returning the basename of 'file'
-            self.textPad.delete(1.0,END)         
-            fh = open(filename,"r")        
-            self.textPad.insert(1.0,fh.read()) 
-            fh.close()
-        self.update_line_number()
+    global filename
+    filename = filedialog.askopenfilename(defaultextension=".json",
+            filetypes=[("All Files","*.*"),("Text Documents","*.txt")])
+    open('app/link/script.dir', "w" ).write(str(filename))
+    if filename == "": # If no file chosen.
+        filename = None # Absence of file.
+    else:
+        self.root.title(os.path.basename(filename)) # Returning the basename of 'file'
+        self.textPad.delete(1.0,END)         
+        fh = open(filename,"r")        
+        self.textPad.insert(1.0,fh.read()) 
+        fh.close()
+    self.update_line_number()
 ##################################################################
 def save(self,event=None):
-        global filename
-        try:
-            f = open(filename, 'w')
-            letter = self.textPad.get(1.0, 'end')
-            f.write(letter)
-            f.close()
-        except:
-            self.save_as()
+    global filename
+    try:
+        f = open(filename, 'w')
+        letter = self.textPad.get(1.0, 'end')
+        f.write(letter)
+        f.close()
+    except:
+        self.save_as()
 
 def save_as(self):
-        try:
-           # Getting a filename to save the file.
-           f = tkFileDialog.asksaveasfilename(initialfile='input.json',defaultextension=".json",
-                                    filetypes=[("All Files","*.*"),("Text Documents","*.txt")])
-           fh = open(f, 'w')           
-           global filename
-           filename = f
-           textoutput = self.textPad.get(1.0, END)
-           fh.write(textoutput)              
-           fh.close()                
-           self.root.title(os.path.basename(f) + " - Tkeditor") 
-        except:
-            pass
+    try:
+       # Getting a filename to save the file.
+       f = filedialog.asksaveasfilename(initialfile='input.json',defaultextension=".json",
+                                filetypes=[("All Files","*.*"),("Text Documents","*.txt")])
+       fh = open(f, 'w')           
+       global filename
+       filename = f
+       textoutput = self.textPad.get(1.0, END)
+       fh.write(textoutput)              
+       fh.close()                
+       self.root.title(os.path.basename(f) + " - Tkeditor") 
+    except:
+        pass
 
 def undo(self):
-        self.textPad.event_generate("<<Undo>>")
-        self.update_line_number()
+    self.textPad.event_generate("<<Undo>>")
+    self.update_line_number()
     
 def redo(self):
         self.textPad.event_generate("<<Redo>>")
         self.update_line_number()
 
 def cut(self):
-        self.textPad.event_generate("<<Cut>>")
-        self.update_line_number()
+    self.textPad.event_generate("<<Cut>>")
+    self.update_line_number()
     
 def copy(self):
-        self.textPad.event_generate("<<Copy>>")
-        self.update_line_number()
+    self.textPad.event_generate("<<Copy>>")
+    self.update_line_number()
 
 def paste(self):
-        self.textPad.event_generate("<<Paste>>")
-        self.update_line_number()
+    self.textPad.event_generate("<<Paste>>")
+    self.update_line_number()
     
 
 def select_all(self,event=None):
-	    self.textPad.tag_add('sel', '1.0', 'end')
+    self.textPad.tag_add('sel', '1.0', 'end')
 
 def search_for(self,needle,cssnstv, textPad, t2,e):
-        textPad.tag_remove('match', '1.0', END)
-        count =0
-        if needle:
-                pos = '1.0'
-                while True:
-                    pos = textPad.search(needle, pos, nocase=cssnstv, stopindex=END)
-                    if not pos: break
-                    lastpos = '%s+%dc' % (pos, len(needle))
-                    textPad.tag_add('match', pos, lastpos)
-                    count += 1
-                    pos = lastpos
-                textPad.tag_config('match', foreground='red', background='yellow')
-        e.focus_set()
-        t2.title('%d matches found' %count)
+    textPad.tag_remove('match', '1.0', END)
+    count =0
+    if needle:
+            pos = '1.0'
+            while True:
+                pos = textPad.search(needle, pos, nocase=cssnstv, stopindex=END)
+                if not pos: break
+                lastpos = '%s+%dc' % (pos, len(needle))
+                textPad.tag_add('match', pos, lastpos)
+                count += 1
+                pos = lastpos
+            textPad.tag_config('match', foreground='red', background='yellow')
+    e.focus_set()
+    t2.title('%d matches found' %count)
 
 def show_info_bar(self):
-        val = self.showinbar.get()
-        if val:
-            self.infobar.pack(expand=NO, fill=None, side=RIGHT, anchor='se')
-        elif not val:
-            self.infobar.pack_forget()
+    val = self.showinbar.get()
+    if val:
+        self.infobar.pack(expand=NO, fill=None, side=RIGHT, anchor='se')
+    elif not val:
+        self.infobar.pack_forget()
 
 def update_line_number(self,event=None):
-        txt = ''
-        if self.showln.get():
-            endline, endcolumn = self.textPad.index('end-1c').split('.')
-            txt = '\n'.join(map(str, range(1, int(endline))))
-        currline, curcolumn = self.textPad.index("insert").split('.')
-        self.infobar.config(text='Line: %s | Column: %s'  %(currline,curcolumn) )
+    txt = ''
+    if self.showln.get():
+        endline, endcolumn = self.textPad.index('end-1c').split('.')
+        txt = '\n'.join(map(str, range(1, int(endline))))
+    currline, curcolumn = self.textPad.index("insert").split('.')
+    self.infobar.config(text='Line: %s | Column: %s'  %(currline,curcolumn) )
 
 def theme(self):
-        global bgc,fgc
-        val = self.themechoice.get()
-        clrs = self.clrschms.get(val)
-        fgc, bgc = clrs.split('.')
-        fgc, bgc = '#'+fgc, '#'+bgc
-        self.textPad.config(bg=bgc, fg=fgc)
+    global bgc,fgc
+    val = self.themechoice.get()
+    clrs = self.clrschms.get(val)
+    fgc, bgc = clrs.split('.')
+    fgc, bgc = '#'+fgc, '#'+bgc
+    self.textPad.config(bg=bgc, fg=fgc)
 
 def highlight_line(self,interval=100):
-        self.textPad.tag_remove("active_line", 1.0, "end")
-        self.textPad.tag_add("active_line", "insert linestart", "insert lineend+1c")
-        self.textPad.after(interval, toggle_highlight)
+    self.textPad.tag_remove("active_line", 1.0, "end")
+    self.textPad.tag_add("active_line", "insert linestart", "insert lineend+1c")
+    self.textPad.after(interval, toggle_highlight)
 
 def undo_highlight(self):
-        self.textPad.tag_remove("active_line", 1.0, "end")
+    self.textPad.tag_remove("active_line", 1.0, "end")
 
 def toggle_highlight(self,event=None):
-        val = self.hltln.get()
-        self.undo_highlight() if not val else self.highlight_line()
+    val = self.hltln.get()
+    self.undo_highlight() if not val else self.highlight_line()
 
 def select00(self):
-        self.value00.get()
-        open('app/link/script00.py', "w" ).write(self.value00.get()) 
-        if  int(self.value00.get())==1:
-            self.button[0].config(bg='#00ffff')
-            self.button[1].config(bg='grey76')
-            self.button[2].config(bg='grey76')
-        elif int(self.value00.get())==2:
-            self.button[1].config(bg='#00ffff')
-            self.button[0].config(bg='grey76')
-            self.button[2].config(bg='grey76')
-        elif  int(self.value00.get())==3:
-            self.button[2].config(bg='#00ffff')
-            self.button[0].config(bg='grey76')
-            self.button[1].config(bg='grey76')
-
+    self.value00.get()
+    open('app/link/script00.py', "w" ).write(self.value00.get()) 
 def select03(self):
-        self.value03.get()
-        open('app/link/script03.py', "w" ).write(self.value03.get())
+    self.value03.get()
+    open('app/link/script03.py', "w" ).write(self.value03.get())
 def select04(self):
-        self.value04.get()
-        open('app/link/script04.py', "w" ).write(self.value04.get())
+    self.value04.get()
+    open('app/link/script04.py', "w" ).write(self.value04.get())
 def select07(self):
-        self.value07.get()
-        open('app/link/script07.py', "w" ).write(self.value07.get())
+    self.value07.get()
+    open('app/link/script07.py', "w" ).write(self.value07.get())
 def select08(self):
-        self.value08.get()
-        open('app/link/script08.py', "w" ).write(self.value08.get())
-        if  str(self.value08.get())=="vacuum":
-            self.button1[0].config(bg='#00ffff')
-            self.button1[1].config(bg='grey76')
-            self.button1[2].config(bg='grey76')
-            self.button1[3].config(bg='grey76')
-        elif  str(self.value08.get())=="reflective":
-            self.button1[1].config(bg='#00ffff')
-            self.button1[0].config(bg='grey76')
-            self.button1[2].config(bg='grey76')
-            self.button1[3].config(bg='grey76')
-        elif  str(self.value08.get())=="vacuum_reflective":
-            self.button1[2].config(bg='#00ffff')
-            self.button1[1].config(bg='grey76')
-            self.button1[0].config(bg='grey76')
-            self.button1[3].config(bg='grey76')
-        elif  str(self.value08.get())=="reflective_vacuum":
-            self.button1[3].config(bg='#00ffff')
-            self.button1[1].config(bg='grey76')
-            self.button1[2].config(bg='grey76')
-            self.button1[0].config(bg='grey76')
+    self.value08.get()
+    open('app/link/script08.py', "w" ).write(self.value08.get())
 
 def select02(self,enent=None):
-        self.value02.get()
-        open('app/link/script02.py', "w" ).write(self.value02.get())  
+    self.value02.get()
+    open('app/link/script02.py', "w" ).write(self.value02.get())  
 
 def select09(self,enent=None):
-        self.value01.get()
-        open('app/link/script01.py', "w" ).write(self.value01.get())  
+    self.value01.get()
+    open('app/link/script01.py', "w" ).write(self.value01.get())  
 
 def select10(self,enent=None):
-        self.value10.get()
-        open('app/link/script10.py', "w" ).write(self.value10.get())
+    self.value10.get()
+    open('app/link/script10.py', "w" ).write(self.value10.get())
 
 def popup(self,event):
-        self.cmenu.tk_popup(event.x_root, event.y_root, 0)
+    self.cmenu.tk_popup(event.x_root, event.y_root, 0)
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 def powerpf(self,enent=None):
-        #define plot size in inches (width, height) & resolution(DPI)
-        fig = plt.figure(figsize=(5, 4), dpi=100)
-        M00 = open('app/link/script00.py', "rb" ).read() 
-        if int(M00) == 1:
-            data = np.loadtxt('app/Output/PF_CP.H')
-        elif int(M00) == 2:
-            data = np.loadtxt('app/Output/PF_SN.H')
-        elif int(M00) == 3:
-            data = np.loadtxt('app/Output/PF_MOC.H')
-        else:
-            tkMessageBox.showwarning("Warning", "select the calculation method")
-        max_columns = 1
-        max_rows = len(data)-1      
-        y_pos = np.arange(1,max_rows+1,1)
-        plt.bar(y_pos, data[1:], align='center',  facecolor='red', alpha=0.5)
-        plt.xticks(y_pos)
+    #define plot size in inches (width, height) & resolution(DPI)
+    fig = plt.figure(figsize=(5, 4), dpi=100)
+    M00 = open('app/link/script00.py', "rb" ).read() 
+    if int(M00) == 1:
+        data = np.loadtxt('app/Output/PF_CP.H')
+    elif int(M00) == 2:
+        data = np.loadtxt('app/Output/PF_SN.H')
+    elif int(M00) == 3:
+        data = np.loadtxt('app/Output/PF_MOC.H')
+    else:
+        messagebox.showwarning("Warning", "select the calculation method")
+    max_columns = 1
+    max_rows = len(data)-1      
+    y_pos = np.arange(1,max_rows+1,1)
+    plt.bar(y_pos, data[1:], align='center',  facecolor='red', alpha=0.5)
+    plt.xticks(y_pos)
+    if int(M00) == 1:
+        plt.title("CP Method")
+    elif int(M00) == 2:
+        plt.title("SN Method") 
+    elif int(M00) == 3:
+        plt.title("MOC")    
+    plt.xlabel('Pin Cell')
+    plt.ylabel('Normalized Pin Power Distribution')
+    plt.show()
+
+def plot(self,enent=None):
+    #define plot size in inches (width, height) & resolution(DPI)
+    fig = plt.figure(figsize=(5, 4), dpi=100)
+    M00 = open('app/link/script00.py', "rb" ).read() 
+    if int(M00) == 1:
+        data = np.loadtxt('app/Output/FLUX_CP.H')
+    elif int(M00) == 2:
+        data = np.loadtxt('app/Output/FLUX_SN.H')
+    elif int(M00) == 3:
+        data = np.loadtxt('app/Output/FLUX_MOC.H')
+    else:
+        messagebox.showwarning("Warning", "select the calculation method")
+
+    if int(len(data)) >= 0:
+        matrix = []  
+        for line in data:
+            matrix.append(line)
+        max_columns = len(matrix[0]) - 1
+        max_rows = len(matrix)
+        x = [matrix[rownum][0] for rownum in range(max_rows)]
+        y = [[matrix[rownum][colnum + 1] for rownum in range(max_rows)]for colnum in range(max_columns)]
+        p = [0]*max_columns
+        name = ['OpenMC','CP','SN','MOC']
+        tt = ['g--','o','k:','r']
+        for i in range(max_columns):
+            #p[i] = plt.plot(x,y[i] ,tt[i],label=name[i])
+            p[i] = plt.plot(x,y[i] ,label="Group %s" %(max_columns-i),linewidth=1)
         if int(M00) == 1:
             plt.title("CP Method")
         elif int(M00) == 2:
             plt.title("SN Method") 
         elif int(M00) == 3:
             plt.title("MOC")    
-        plt.xlabel('Pin Cell')
-        plt.ylabel('Normalized Pin Power Distribution')
+        plt.xlabel('Distance  [cm]')
+        #plt.xticks(range(1,52,5))
+        plt.ylabel('Normalized Flux')
+        plt.legend()
         plt.show()
-
-def plot(self,enent=None):
-        #define plot size in inches (width, height) & resolution(DPI)
-        fig = plt.figure(figsize=(5, 4), dpi=100)
-        M00 = open('app/link/script00.py', "rb" ).read() 
-        if int(M00) == 1:
-            data = np.loadtxt('app/Output/FLUX_CP.H')
-        elif int(M00) == 2:
-            data = np.loadtxt('app/Output/FLUX_SN.H')
-        elif int(M00) == 3:
-            data = np.loadtxt('app/Output/FLUX_MOC.H')
-        else:
-            tkMessageBox.showwarning("Warning", "select the calculation method")
-
-        if int(len(data)) >= 0:
-            matrix = []  
-            for line in data:
-                matrix.append(line)
-            max_columns = len(matrix[0]) - 1
-            max_rows = len(matrix)
-            x = [matrix[rownum][0] for rownum in range(max_rows)]
-            y = [[matrix[rownum][colnum + 1] for rownum in range(max_rows)]for colnum in range(max_columns)]
-            p = [0]*max_columns
-            name = ['OpenMC','CP','SN','MOC']
-            tt = ['g--','o','k:','r']
-            for i in range(max_columns):
-                #p[i] = plt.plot(x,y[i] ,tt[i],label=name[i])
-                p[i] = plt.plot(x,y[i] ,label="Group %s" %(max_columns-i),linewidth=1)
-            if int(M00) == 1:
-                plt.title("CP Method")
-            elif int(M00) == 2:
-                plt.title("SN Method") 
-            elif int(M00) == 3:
-                plt.title("MOC")    
-            plt.xlabel('Distance  [cm]')
-            #plt.xticks(range(1,52,5))
-            plt.ylabel('Normalized Flux')
-            plt.legend()
-            plt.show()
-        else:
-            tkMessageBox.showwarning("Warning", "Select More than a Fine Number of Meshes")
+    else:
+        messagebox.showwarning("Warning", "Select More than a Fine Number of Meshes")
 def geometry():
-        print 'geometry'
+    print ('geometry')
 
 def run(event=None):
-    proc = subprocess.Popen(['python', 'main.py'],
-                                stdout=subprocess.PIPE, 
-                                stderr=subprocess.PIPE)
+    cmd = 'python3 main.py'
+    proc = subprocess.Popen(shlex.split(cmd), stdout = subprocess.PIPE, stderr=subprocess.PIPE, encoding = 'utf8')
     a = None
     Test = None
     while 1:
@@ -919,105 +878,106 @@ def run(event=None):
             break
         elif type(text) == str or text == '.':
             Test = str(a)
-            print text
+            print (text)
 
     if  Test == str(a):
-        tkMessageBox.showwarning("Warning", "Running case finished")
+        messagebox.showwarning("Warning", "Running case finished")
     else:
-        tkMessageBox.showwarning("Warning", "Check Error")
-         
-
+        messagebox.showwarning("Warning", "Check Error")
 
 def compile():
-    M00 = open('app/link/script00.py', "r" ).read()  
-
+    M00 = open('app/link/script00.py', "r" ).read() 
     if int(M00) == 1:
         if os.path.exists('app/SlabCP.so'):
-            os.remove('app/SlabCP.so')
-        proc = subprocess.Popen(['f2py','-c','app/sources/TRANSPORT_CP.f90','-m','SlabCP'],
-                                        stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE)
+            os.remove('app/SlabCP.so') 
+        cmd = 'f2py3 -c app/sources/TRANSPORT_CP.f90 -m SlabCP'
+        proc = subprocess.Popen(shlex.split(cmd), stdout = subprocess.PIPE, stderr=subprocess.PIPE, encoding = 'utf8')
         while 1:
             text = proc.stdout.readline()[:-1]
             if type(text) != str or text == '' and proc.poll() != None: 
                 break
  
             elif type(text) == str and len(text) > 6:
-                print text
-        shutil.move('SlabCP.so', 'app') 
-    
+                print (text)
+        if os.path.exists('SlabCP.cpython-38-x86_64-linux-gnu.so'):
+            os.rename('SlabCP.cpython-38-x86_64-linux-gnu.so', 'SlabCP.so')
+        shutil.move('SlabCP.so', 'app')
+
     elif int(M00) == 2:
         if os.path.exists('app/SlabSN.so'):
             os.remove('app/SlabSN.so') 
-        proc = subprocess.Popen(['f2py','-c','app/sources/TRANSPORT_SN.f90','-m','SlabSN'], 
-                                        stderr=subprocess.PIPE, 
-                                        stdout=subprocess.PIPE)
+        cmd = 'f2py3 -c app/sources/TRANSPORT_SN.f90 -m SlabSN'
+        proc = subprocess.Popen(shlex.split(cmd), stdout = subprocess.PIPE, stderr=subprocess.PIPE, encoding = 'utf8')
         while 1:
             text = proc.stdout.readline()[:-1]
             if type(text) != str or text == '' and proc.poll() != None: 
                 break
  
             elif type(text) == str and len(text) > 6:
-                print text
+                print (text)
+        if os.path.exists('SlabSN.cpython-38-x86_64-linux-gnu.so'):
+            os.rename('SlabSN.cpython-38-x86_64-linux-gnu.so', 'SlabSN.so')
         shutil.move('SlabSN.so', 'app')
 
     elif int(M00) == 3:
         if os.path.exists('app/SlabMOC.so'):
             os.remove('app/SlabMOC.so')
-        proc = subprocess.Popen(['f2py','-c','app/sources/TRANSPORT_MOC.f90','-m','SlabMOC'],
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.PIPE)
+        cmd = 'f2py3 -c app/sources/TRANSPORT_MOC.f90 -m SlabMOC'
+        proc = subprocess.Popen(shlex.split(cmd), stdout = subprocess.PIPE, stderr=subprocess.PIPE, encoding = 'utf8')
         while 1:
             text = proc.stdout.readline()[:-1]
             if type(text) != str or text == '' and proc.poll() != None: 
                 break
  
             elif type(text) == str and len(text) > 6:
-                print text
+                print (text)
+        if os.path.exists('SlabMOC.cpython-38-x86_64-linux-gnu.so'):
+            os.rename('SlabMOC.cpython-38-x86_64-linux-gnu.so', 'SlabMOC.so')
         shutil.move('SlabMOC.so', 'app')
     else:
-        tkMessageBox.showwarning("Warning", "select the calculation method")
+        messagebox.showwarning("Warning", "select the calculation method")
 
 def about():
-        newWindow = Toplevel()
-        newWindow.overrideredirect(1)
-        newWindow.geometry("500x200+490+290")
-        newWindow.config(bg='grey76')
-        newWindow.title("Deterministic Code")
-        a0 = Label(newWindow, text="NTP-ERSN")
-        a0.config(fg='red',bg='grey76',font=("Helvetica", 16,"bold"))
-        a0.pack()
-        a1 = Label(newWindow, text='Python GUI Programming Using Tkinter')
-        a1.config(fg='blue',bg='grey76',font=("Helvetica", 11))
-        a1.pack()
-        a2 = Label(newWindow, text='This project was developed by Mohamed LAHDOUR'
+    newWindow = Toplevel()
+    newWindow.overrideredirect(1)
+    newWindow.geometry("500x200+490+290")
+    newWindow.config(bg='grey76')
+    newWindow.title("Deterministic Code")
+    a0 = Label(newWindow, text="NTP-ERSN")
+    a0.config(fg='red',bg='grey76',font=("Helvetica", 16,"bold"))
+    a0.pack()
+    a1 = Label(newWindow, text='Python GUI Programming Using Tkinter')
+    a1.config(fg='blue',bg='grey76',font=("Helvetica", 11))
+    a1.pack()
+    a2 = Label(newWindow, text='This project was developed by Mohamed LAHDOUR'
                                    ' & Tarek EL Bardouni')
-        a2.config(fg='black',bg='grey76',font=("Helvetica", 11))
-        a2.pack()
-        a3 = Label(newWindow,text="Departement of Physics, Laboratory of Radiation"
+    a2.config(fg='black',bg='grey76',font=("Helvetica", 11))
+    a2.pack()
+    a3 = Label(newWindow,text="Departement of Physics, Laboratory of Radiation"
                                   "& Nuclear Systems")
-        a3.config(fg='black',bg='grey76',font=("Helvetica", 11))
-        a3.pack()
-        a4 = Label(newWindow,text="University Abdelmalek Essaadi, Faculty of sciences"
+    a3.config(fg='black',bg='grey76',font=("Helvetica", 11))
+    a3.pack()
+    a4 = Label(newWindow,text="University Abdelmalek Essaadi, Faculty of sciences"
                                   "Tetouan (Morocco)")
-        a4.config(fg='black',bg='grey76',font=("Helvetica", 11))
-        a4.pack()
-        b1=Button(newWindow,text="close", font='Times',bg='white',command=newWindow.destroy)
-        b1.pack(pady=10)
+    a4.config(fg='black',bg='grey76',font=("Helvetica", 11))
+    a4.pack()
+    b1=Button(newWindow,text="close", font='Times',bg='white',command=newWindow.destroy)
+    b1.pack(pady=10)
 def help_box(event=None):
-        newWindow = Toplevel()
-        newWindow.overrideredirect(1)
-        newWindow.geometry("500x180+490+290")
-        newWindow.config(bg='grey76')
-        newWindow.title("Help")
-        a0 = Label(newWindow, text="NTP-ERSN")
-        a0.config(fg='red',bg='grey76',font=("Helvetica", 16,"bold"))
-        a0.pack()
-        a1 = Label(newWindow, text="For Help Contact Us:")
-        a1.config(fg='black',bg='grey76',font=("Helvetica", 11))
-        a1.pack()
-        a2 = Label(newWindow, text="mlahdour@uae.ac.ma  &  telbardouni@uae.ac.ma")
-        a2.config(fg='black',bg='grey76',font=("Helvetica", 11))
-        a2.pack()
-        b1=Button(newWindow,text="close", font='Times',bg='white',command=newWindow.destroy)
-        b1.pack(pady=10)
+    newWindow = Toplevel()
+    newWindow.overrideredirect(1)
+    newWindow.geometry("500x180+490+290")
+    newWindow.config(bg='grey76')
+    newWindow.title("Help")
+    a0 = Label(newWindow, text="NTP-ERSN")
+    a0.config(fg='red',bg='grey76',font=("Helvetica", 16,"bold"))
+    a0.pack()
+    a1 = Label(newWindow, text="For Help Contact Us:")
+    a1.config(fg='black',bg='grey76',font=("Helvetica", 11))
+    a1.pack()
+    a2 = Label(newWindow, text="mlahdour@uae.ac.ma  &  telbardouni@uae.ac.ma")
+    a2.config(fg='black',bg='grey76',font=("Helvetica", 11))
+    a2.pack()
+    b1=Button(newWindow,text="close", font='Times',bg='white',command=newWindow.destroy)
+    b1.pack(pady=10)
+

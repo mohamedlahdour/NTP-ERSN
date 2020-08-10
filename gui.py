@@ -1,28 +1,25 @@
-#!usr/bin/python
+#!usr/bin/python3
 # -*- coding: utf-8 -*-
-from Tkinter import *
-import ttk
+from tkinter import *
+from tkinter import ttk 
 import time
 import sys
 import platform
-import Tkinter as tk
-import pygmyplot 
-import ScrolledText
+import tkinter as tk
 from multiprocessing import Process  
 from threading import Thread
 import json
-from PIL import ImageTk
 from app.func import *
-import Tix as tix
+from tkinter import tix
 import textwrap
 
 class HoverInfo():
-    """Allow to display an info window near a Tkinter widget. Based on
+    """Allow to display an info window near a tkinter widget. Based on
     ToolTipBase object from evandrix (idlelib)
     
     Parameters
     ----------
-        master : Tkinter widget
+        master : tkinter widget
         text : str
             Text to display in the info window.
         width : int
@@ -118,6 +115,14 @@ class Application(Frame):
         self.root.geometry("1050x636+250+50")
         self.root.columnconfigure(1, weight=1)
         self.root.rowconfigure(7, weight=1)
+        style = ttk.Style()
+        style.configure('BW.TButton', font=('Times', 11),foreground='black', background='grey76',relief='raised',borderwidth=2)
+        style.configure('BW.TLabel', foreground='black', background='grey76')
+        style.configure("BW.TMenubutton", foreground='black',font=('Helvetica', 11)) 
+        style.configure('BW.TRadiobutton',font=('Times', 11),background='grey76',borderwidth=4,foreground='black', padding=5,relief='raised')
+        style.map('BW.TRadiobutton',background=[('selected', '#00ffff'), ('active', 'grey90')])
+        #style.theme_use('classic')  # 'aqua', 'step', 'clam','classic'
+
         
         # Color GUI
         self.pientur = 'white' # 
@@ -145,20 +150,11 @@ class Application(Frame):
         self.value04.set(open('app/link/script04.py', "r" ).read())
         msg1 = ['Collision Probability (CP) Method','Discrete Ordinates (SN) Method','Method Of Characteristics (MOC)']
         self.button = [0]*3
-        for (n,method,val) in [(0, '   CP      ',1),(1, '   SN      ',2),(2, 'MOC    ',3)]:          
-            self.button[n] = Radiobutton(Frame01, text=method, font='Times',relief='raised',borderwidth=4)
+        for (n,method,val) in [(0, '    CP      ',1),(1, '    SN      ',2),(2, '    MOC     ',3)]:          
+            self.button[n] = ttk.Radiobutton(Frame01, text=method, style='BW.TRadiobutton')
             self.button[n].config(variable=self.value00,value=val, command=self.select00)
-            self.button[n].config(height=1, width=8) 
-            self.button[n].config(bg='gray76' , fg='black',highlightbackground='blue')
             self.button[n].grid(row =0, column =n ,sticky=NSEW)
             hover = HoverInfo(self.button[n], msg1[n])
-
-        if  int(self.value00.get())==1:
-            self.button[0].config(bg='#00ffff') 
-        elif  int(self.value00.get())==2:
-            self.button[1].config(bg='#00ffff')
-        elif  int(self.value00.get())==3:
-            self.button[2].config(bg='#00ffff')
 
         #/////////////////////////////////////////////////////////////////////////////////////////
         # construction Frame02
@@ -181,7 +177,7 @@ class Application(Frame):
                            (8, 'Legendre Order')]:
             Frame20 = LabelFrame(Frame02, width=155, height=40, bg=self.pientur)
             Frame20.grid(row=n, column=0, sticky=NSEW)
-            self.lab0[n] = Label(Frame20, width=18,height=1, text=field, anchor='w',bg=self.labell)
+            self.lab0[n] = ttk.Label(Frame20, width=22, text=field, anchor='w',style='BW.Label')
             if n == 6 :
                 self.ent0[n] = Spinbox(Frame20, width=6,from_=0, to=5000,increment=2)
             else:
@@ -195,7 +191,7 @@ class Application(Frame):
             Frame20 = LabelFrame(Frame02, width=155, height=40, bg=self.pientur)
             Frame20.grid(row=n, column=0, sticky=NSEW)
             
-            self.lab0[n] = Label(Frame20, width=18,height=1, text=field, anchor='w',bg=self.labell)
+            self.lab0[n] = ttk.Label(Frame20, width=22, text=field, anchor='w',style='BW.Label')
             if n==10:
                 self.ent0[n] = Spinbox(Frame20, width=6,from_=0.00000001, to=0.000001,
                                        increment=0.0000009,textvariable=number)
@@ -217,16 +213,14 @@ class Application(Frame):
         self.value01 = StringVar()
         self.value01.set(open('app/link/script01.py', "r" ).read())
         # initial value
-        choices = ['Pin Cell','Assembly','Core']
-        self.option = OptionMenu(Frame03, self.value01, *choices,  command =self.select09)
-        self.option["menu"].config(foreground='black',font=('Helvetica', 11))
-        self.option.config(width=13)
+        choices = ['Select Geometry','Pin Cell','Assembly','Core']
+        self.option = ttk.OptionMenu(Frame03, self.value01, *choices,  command =self.select09,style='BW.TMenubutton')
+        self.option.config(width=12)
         self.option.grid(row=0, column=0, sticky=NSEW)
-        button = Button(Frame03, text='Insert', font='Times', relief='raised',borderwidth=4)
+
+        button = ttk.Button(Frame03, text='Insert', style='BW.TButton')
         button.config(command=self.new1)
-        button.config(bg=self.boutton , fg='black')
-        button.config(height=1, width=4)
-        button.grid(row =0, column =1,sticky=NSEW)
+        button.grid(row =0, column =1,sticky=NSEW,ipadx =2)
 
         #hover = HoverInfo(self.option, 'Choose Discritization Scheme for the Discrete Ordinates (SN) Method') 
 
@@ -236,25 +230,21 @@ class Application(Frame):
         self.value02 = StringVar()
         self.value02.set(open('app/link/script02.py', "r" ).read())
         # initial value
-        choices = ['TotalXS','FissionXS','NuFissionXS','ScatterMatrixXS','ChiXS']
-        self.option = OptionMenu(Frame05, self.value02, *choices,  command =self.select02)
-        self.option["menu"].config(foreground='black',font=('Helvetica', 11))
-        self.option.config(width=13)
+        choices = ['Select XS','TotalXS','FissionXS','NuFissionXS','ScatterMatrixXS','ChiXS']
+        self.option = ttk.OptionMenu(Frame05, self.value02, *choices,  command =self.select02,style='BW.TMenubutton')
+        self.option.config(width=12)
         self.option.grid(row=0, column=0, sticky=NS)
-        button = Button(Frame05, text='Insert', font='Times', relief='raised',borderwidth=4)
+        button = ttk.Button(Frame05, text='Insert', style='BW.TButton')
         button.config(command=self.new2)
-        button.config(bg=self.boutton , fg='black')
-        button.config(height=1, width=4)
-        button.grid(row =0, column =1,sticky=NSEW)
+        button.grid(row =0, column =1,sticky=NSEW,ipadx =2)
         
         #/////////////////////////////////////////////////////////////////////////////////////////
             
         Frame04 = LabelFrame(Frame02, width=155, height=40, text="Generate Input",
                             font=("Helvetica", 10), fg='blue', bg=self.pientur)
         Frame04.grid(row=13, column=0, sticky=NSEW)
-        b1 = Button(Frame04, text ='Generate Input File', command =self.data_up,relief='raised',borderwidth=4)
-        b1.config(bg=self.labell , fg='black')
-        b1.grid(row =0, column =0,sticky='nesw',ipadx =27)
+        b1 = ttk.Button(Frame04, text ='Generate Input File', command =self.data_up,style='BW.TButton')
+        b1.grid(row =0, column =0,sticky='nesw',ipadx =35)
         #/////////////////////////////////////////////////////////////////////////////////////////
         # construction Frame04
         Frame04 = LabelFrame(self.root2, width=155, height=40, text="Boundary conditions",
@@ -267,22 +257,10 @@ class Application(Frame):
                                   (1, 'Reflective                   ',"reflective"),
                                   (2, 'Vacuum Reflective      ',"vacuum_reflective"),
                                   (3, 'Reflective Vacuum      ',"reflective_vacuum")]:
-        
-         
-            self.button1[n] = Radiobutton(Frame04, text=boundary,relief='raised')
+            self.button1[n] = ttk.Radiobutton(Frame04, text=boundary,style='BW.TRadiobutton')
             self.button1[n].config(variable=self.value08, value=boun,command=self.select08)
-            self.button1[n].config(bg=self.labell , fg='black')
-            self.button1[n].config(height=2,width=18)
+            self.button1[n].config(width=19)
             self.button1[n].grid(row =n, column =0,sticky=NSEW)
-
-        if  str(self.value08.get())=='vacuum':
-            self.button1[0].config(bg='#00ffff') 
-        elif  str(self.value08.get())=='reflective':
-            self.button1[1].config(bg='#00ffff')
-        elif  str(self.value08.get())=='vacuum_reflective':
-            self.button1[2].config(bg='#00ffff')
-        elif  str(self.value08.get())=='reflective_vacuum':
-            self.button1[3].config(bg='#00ffff')
 
         #/////////////////////////////////////////////////////////////////////////////////////////
         Frame09 = LabelFrame(self.root2, width=50, height=40, text="Approximation Scheme",
@@ -292,10 +270,9 @@ class Application(Frame):
         self.value09.set(open('app/link/script09.py', "r" ).read())
         # initial value
         self.value09.set('Diamond Difference')
-        choices = ['Diamond Difference','Step Difference']
-        self.option = OptionMenu(Frame09, self.value09, *choices,  command =self.select09)
-        self.option["menu"].config(foreground='black',font=('Helvetica', 11))
-        self.option.config(width=16)
+        choices = ['Select Scheme','Diamond Difference','Step Difference']
+        self.option = ttk.OptionMenu(Frame09, self.value09, *choices,  command =self.select09,style='BW.TMenubutton')
+        self.option.config(width=17)
         self.option.grid(row=0, column=0,sticky=NSEW)
         hover = HoverInfo(self.option, 'Choose Discritization Scheme for the Discrete Ordinates (SN) Method') 
         #-----------------------------------------------------------------------------------------
@@ -303,10 +280,9 @@ class Application(Frame):
         self.value10.set(open('app/link/script10.py', "r" ).read())
         # initial value
         self.value10.set('Step Characteristics')
-        choices = ['Step Characteristics','DD0','DD1']
-        self.option = OptionMenu(Frame09, self.value10, *choices,  command =self.select10)
-        self.option["menu"].config(foreground='black',font=('Helvetica', 11))
-        self.option.config(width=16)
+        choices = ['Select Scheme','Step Characteristics','DD0','DD1']
+        self.option = ttk.OptionMenu(Frame09, self.value10, *choices,  command =self.select10,style='BW.TMenubutton')
+        self.option.config(width=17)
         self.option.grid(row=1, column=0,sticky=NSEW)
         hover = HoverInfo(self.option, 'Choose Discritization Scheme for the Method Of Characteristics (MOC)') 
         #/////////////////////////////////////////////////////////////////////////////////////////
@@ -314,20 +290,18 @@ class Application(Frame):
                             font=("Helvetica", 10), fg='blue',bg=self.pientur)
         Frame10.grid(row=4, column=3, sticky=NSEW)
 
-        b1 = Button(Frame10, text ='Geometry ', command =self.Draw,relief='raised',borderwidth=4)
-        b1.config(bg=self.labell , fg='black')
+        b1 = ttk.Button(Frame10, text ='Geometry ', command =self.Draw,style='BW.TButton')
         #b1.config(state="disabled")
-        b1.grid(row =4, column =3,sticky=NSEW,ipadx =13)
+        b1.grid(row =4, column =3,sticky=NSEW)
 
-        b2 = Button(Frame10, text ='PowerPF ', command =self.powerpf,relief='raised',borderwidth=4)
-        b2.config(bg=self.labell , fg='black')
+        b2 = ttk.Button(Frame10, text ='PowerPF ', command =self.powerpf,style='BW.TButton')
         #b1.config(state="disabled")
-        b2.grid(row =5, column =3,sticky=NSEW,ipadx =13)
+        b2.grid(row =5, column =3,sticky=NSEW)
 
-        b3 = Button(Frame10, text ='Mesh Scalar Flux ', command =self.plot,relief='raised',borderwidth=4)
-        b3.config(bg=self.labell , fg='black')
+        b3 = ttk.Button(Frame10, text ='Mesh Scalar Flux ', command =self.plot,style='BW.TButton')
         #b1.config(state="disabled")
-        b3.grid(row =6, column =3,sticky=NSEW,ipadx =13)
+        b3.grid(row =6, column =3,sticky=NSEW,ipadx =17)
+
 
         style = ttk.Style()
         style.configure('.', font=('Times', 11),fg='blue')
@@ -338,8 +312,8 @@ class Application(Frame):
         notebook = ttk.Notebook(Frame05, width=600, height=286)
         framenotebook1 = Frame(notebook)
         framenotebook2 = Frame(notebook)
-        notebook.add(framenotebook1, text=' Terminal   ')
-        notebook.add(framenotebook2, text=' Text editor')
+        notebook.add(framenotebook1, text=' Output window   ')
+        notebook.add(framenotebook2, text=' Input window    ')
         notebook.pack(expand=YES, fill=BOTH)
         
         self.output = Text(framenotebook1,background = 'white', fg='black', bg=self.pientur)
@@ -363,11 +337,9 @@ class Application(Frame):
         button = [0]*2
         for (n,controle,com) in [(0, 'Compile',compile),(1, 'Run',run)]:  
        
-            button[n] = Button(Frame07, text=controle, font='Times', relief='raised',borderwidth=4)
+            button[n] = ttk.Button(Frame07, text=controle, style='BW.TButton')
             button[n].config(command = com)
-            button[n].config(bg=self.labell , fg='black')
-            button[n].config(activebackground ='#00ffff')
-            button[n].grid(row =n, column =3, sticky='nesw', ipadx =43)
+            button[n].grid(row =n, column =3, sticky='nesw', ipadx =53)
         ######################################################################
         #defining icons for compund menu demonstration
         self.eyeicon = PhotoImage(file='app/icons/eye.gif')
@@ -559,9 +531,9 @@ class Application(Frame):
 
         Frame08 = Frame(self.root2, width=50, height=40)
         Frame08.grid(row=8, column=0, columnspan=4, sticky=NSEW )
-        v1 = "System",":", platform.system(),platform.dist()
+        v1 = "System",":", platform.system(), platform.release()
         v2 = "Python",":", platform.python_version()
-        v3 = "Tkinter",":",tk.TkVersion
+        v3 = "tkinter",":",tk.TkVersion
         for (n,version) in [(3,v1),(4,v2),(5,v3)]:
             barreEtat = Label(Frame08, text=version, bd=2, anchor=W)
             barreEtat.grid(row=8,column=n)
