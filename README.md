@@ -89,11 +89,11 @@ User's Guide
 1. Graphical User Interface
 --------------------------
 
-A graphical user interface written in Python programing language has been developed to simplify the use of package **NTP-ERSN**.
+A graphical user interface written in Python3 programing language has been developed to simplify the use of package **NTP-ERSN**.
 After starting the software by typing the following command line in a terminal:
 
          cd NTP-ERSN
-         $ python gui.py
+         $ ./GUI-NTP-ERSN
 
 A main window (GUI) of the package **NTP-ERSN** an Ubuntu Linux machine will be displayed as in Figure bellow.
 
