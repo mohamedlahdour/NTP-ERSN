@@ -81,7 +81,7 @@ Installing on Linux
 
    * If you want to use it through a command prompt (Terminal):
 
-        $ ./NTP-ERSN
+         $ ./NTP-ERSN
 
 User's Guide
 ============
