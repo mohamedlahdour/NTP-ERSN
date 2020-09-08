@@ -1,1 +1,1 @@
-ChiXS
+TotalXS

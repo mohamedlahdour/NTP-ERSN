@@ -81,14 +81,11 @@ if int(Method) == 2:
         app.SlabSN.timestamp()
         it,inter,k_eff,phi = app.SlabSN.outer_iteration(Max_it,scheme1,eps,wt,mu,d,f,u,l,a,b,p,BC,sigt,delta,
                              nusigf,sigf,chi,fmmid,[ng,dim,totnfm,ngauss,order,nmat])
-
-
         sfpc,sf = app.SlabSN.scalarfluxpinc(nfmesh,delta,assembly,phi,sigf,fmmid,core,[dim,totnfm,nmat,ng,nx,nxx,npx,npc,na])
         app.SlabSN.plot_flux(nmat,nx,nxx,napc,delta,phi,sfpc,sf,[dim,totnfm,ng])
         interval = datetime.now()-start
         app.SlabSN.output(str(start),BC,str(interval),k_eff,sigt,nusigf,sigs,chi,mu,wt,delta,
                      phi,eps,it,inter,[totnfm,dim,ng,nmat,order,ngauss])
-
         print ('  Total time to solution      ........................     ', interval)  
         app.SlabSN.title2()
         del sigt,sigs,nusigf,chi,mu,wt,fmmid,nfmesh
@@ -226,6 +223,7 @@ elif int(Method) == 3:
         print ('  Total time to solution      ........................     ', interval ) 
         app.SlabMOC.title2()
         del sigt,sigs,nusigf,chi,mu,wt,fmmid,nfmesh 
+
 
         
 
