@@ -121,7 +121,7 @@ class Application(Frame):
         style.configure("BW.TMenubutton", foreground='black',font=('Helvetica', 11)) 
         style.configure('BW.TRadiobutton',font=('Times', 11),background='grey76',borderwidth=4,foreground='black', padding=5,relief='raised')
         style.map('BW.TRadiobutton',background=[('selected', '#00ffff'), ('active', 'grey90')])
-        #style.theme_use('classic')  # 'aqua', 'step', 'clam','classic'
+        style.theme_use('clam')  # 'aqua', 'step', 'clam','classic'
 
         
         # Color GUI
@@ -153,12 +153,12 @@ class Application(Frame):
         for (n,method,val) in [(0, '    CP      ',1),(1, '    SN      ',2),(2, '    MOC     ',3)]:          
             self.button[n] = ttk.Radiobutton(Frame01, text=method, style='BW.TRadiobutton')
             self.button[n].config(variable=self.value00,value=val, command=self.select00)
-            self.button[n].grid(row =0, column =n ,sticky=NSEW)
+            self.button[n].grid(row =0, column =n ,sticky=NSEW,ipadx =20)
             hover = HoverInfo(self.button[n], msg1[n])
 
         #/////////////////////////////////////////////////////////////////////////////////////////
         # construction Frame02
-        Frame02 = LabelFrame(self.root2, width=155, height=40 , text="Input Parametres",font=("Helvetica", 10), 
+        Frame02 = LabelFrame(self.root2, height=40 , text="Input Parametres",font=("Helvetica", 10), 
                              fg='blue', bg=self.pientur)
         Frame02.grid(row=2, column=0,rowspan=6 , sticky=NSEW)
         self.value07 = StringVar()
@@ -177,7 +177,7 @@ class Application(Frame):
                            (8, 'Legendre Order')]:
             Frame20 = LabelFrame(Frame02, width=155, height=40, bg=self.pientur)
             Frame20.grid(row=n, column=0, sticky=NSEW)
-            self.lab0[n] = ttk.Label(Frame20, width=22, text=field, anchor='w',style='BW.Label')
+            self.lab0[n] = ttk.Label(Frame20, width=24, text=field, anchor='w',style='BW.Label')
             if n == 6 :
                 self.ent0[n] = Spinbox(Frame20, width=6,from_=0, to=5000,increment=2)
             else:
@@ -191,7 +191,7 @@ class Application(Frame):
             Frame20 = LabelFrame(Frame02, width=155, height=40, bg=self.pientur)
             Frame20.grid(row=n, column=0, sticky=NSEW)
             
-            self.lab0[n] = ttk.Label(Frame20, width=22, text=field, anchor='w',style='BW.Label')
+            self.lab0[n] = ttk.Label(Frame20, width=24, text=field, anchor='w',style='BW.Label')
             if n==10:
                 self.ent0[n] = Spinbox(Frame20, width=6,from_=0.00000001, to=0.000001,
                                        increment=0.0000009,textvariable=number)
@@ -206,7 +206,7 @@ class Application(Frame):
                 self.lab0[n].grid(row=n, column=0,sticky=NSEW)
                 self.ent0[n].grid(row=n, column=1,sticky=NSEW)
 
-        Frame03 = LabelFrame(Frame02, width=155, height=40, text="Constructive Geometry",
+        Frame03 = LabelFrame(Frame02, height=40, text="Constructive Geometry",
                             font=("Helvetica", 10), fg='blue', bg=self.pientur)
         Frame03.grid(row=11, column=0,sticky=NSEW)
 
@@ -215,12 +215,12 @@ class Application(Frame):
         # initial value
         choices = ['Select Geometry','Pin Cell','Assembly','Core']
         self.option = ttk.OptionMenu(Frame03, self.value01, *choices,  command =self.select09,style='BW.TMenubutton')
-        self.option.config(width=12)
+        self.option.config(width=15)
         self.option.grid(row=0, column=0, sticky=NSEW)
 
         button = ttk.Button(Frame03, text='Insert', style='BW.TButton')
         button.config(command=self.new1)
-        button.grid(row =0, column =1,sticky=NSEW,ipadx =2)
+        button.grid(row =0, column =1,sticky=NSEW,ipadx =1)
 
         #hover = HoverInfo(self.option, 'Choose Discritization Scheme for the Discrete Ordinates (SN) Method') 
 
@@ -232,22 +232,22 @@ class Application(Frame):
         # initial value
         choices = ['Select XS','TotalXS','FissionXS','NuFissionXS','ScatterMatrixXS','ChiXS']
         self.option = ttk.OptionMenu(Frame05, self.value02, *choices,  command =self.select02,style='BW.TMenubutton')
-        self.option.config(width=12)
+        self.option.config(width=15)
         self.option.grid(row=0, column=0, sticky=NS)
         button = ttk.Button(Frame05, text='Insert', style='BW.TButton')
         button.config(command=self.new2)
-        button.grid(row =0, column =1,sticky=NSEW,ipadx =2)
+        button.grid(row =0, column =1,sticky=NSEW,ipadx =1)
         
         #/////////////////////////////////////////////////////////////////////////////////////////
             
-        Frame04 = LabelFrame(Frame02, width=155, height=40, text="Generate Input",
+        Frame04 = LabelFrame(Frame02, height=40, text="Generate Input",
                             font=("Helvetica", 10), fg='blue', bg=self.pientur)
         Frame04.grid(row=13, column=0, sticky=NSEW)
         b1 = ttk.Button(Frame04, text ='Generate Input File', command =self.data_up,style='BW.TButton')
-        b1.grid(row =0, column =0,sticky='nesw',ipadx =35)
+        b1.grid(row =0, column =0,sticky='nesw',ipadx =51)
         #/////////////////////////////////////////////////////////////////////////////////////////
         # construction Frame04
-        Frame04 = LabelFrame(self.root2, width=155, height=40, text="Boundary conditions",
+        Frame04 = LabelFrame(self.root2, height=40, text="Boundary conditions",
                             font=("Helvetica", 10), fg='blue',bg=self.pientur)
         Frame04.grid(row=2, column=3, sticky=NSEW)
         self.value08 = StringVar()
@@ -259,11 +259,10 @@ class Application(Frame):
                                   (3, 'Reflective Vacuum      ',"reflective_vacuum")]:
             self.button1[n] = ttk.Radiobutton(Frame04, text=boundary,style='BW.TRadiobutton')
             self.button1[n].config(variable=self.value08, value=boun,command=self.select08)
-            self.button1[n].config(width=19)
-            self.button1[n].grid(row =n, column =0,sticky=NSEW)
+            self.button1[n].grid(row =n, column =0,sticky=NSEW,ipadx =2)
 
         #/////////////////////////////////////////////////////////////////////////////////////////
-        Frame09 = LabelFrame(self.root2, width=50, height=40, text="Approximation Scheme",
+        Frame09 = LabelFrame(self.root2, height=40, text="Approximation Scheme",
                              font=("Helvetica", 10), fg='blue',bg=self.pientur)
         Frame09.grid(row=3, column=3,sticky=NSEW)
         self.value09 = StringVar()
@@ -272,7 +271,7 @@ class Application(Frame):
         self.value09.set('Diamond Difference')
         choices = ['Select Scheme','Diamond Difference','Step Difference']
         self.option = ttk.OptionMenu(Frame09, self.value09, *choices,  command =self.select09,style='BW.TMenubutton')
-        self.option.config(width=17)
+        self.option.config(width=19)
         self.option.grid(row=0, column=0,sticky=NSEW)
         hover = HoverInfo(self.option, 'Choose Discritization Scheme for the Discrete Ordinates (SN) Method') 
         #-----------------------------------------------------------------------------------------
@@ -282,11 +281,11 @@ class Application(Frame):
         self.value10.set('Step Characteristics')
         choices = ['Select Scheme','Step Characteristics','DD0','DD1']
         self.option = ttk.OptionMenu(Frame09, self.value10, *choices,  command =self.select10,style='BW.TMenubutton')
-        self.option.config(width=17)
+        self.option.config(width=19)
         self.option.grid(row=1, column=0,sticky=NSEW)
         hover = HoverInfo(self.option, 'Choose Discritization Scheme for the Method Of Characteristics (MOC)') 
         #/////////////////////////////////////////////////////////////////////////////////////////
-        Frame10 = LabelFrame(self.root2, width=50, height=40, text="Visualization",
+        Frame10 = LabelFrame(self.root2, height=40, text="Visualization",
                             font=("Helvetica", 10), fg='blue',bg=self.pientur)
         Frame10.grid(row=4, column=3, sticky=NSEW)
 
@@ -300,7 +299,7 @@ class Application(Frame):
 
         b3 = ttk.Button(Frame10, text ='Mesh Scalar Flux ', command =self.plot,style='BW.TButton')
         #b1.config(state="disabled")
-        b3.grid(row =6, column =3,sticky=NSEW,ipadx =17)
+        b3.grid(row =6, column =3,sticky=NSEW,ipadx =20)
 
 
         style = ttk.Style()
@@ -329,7 +328,7 @@ class Application(Frame):
         sys.stdout = redir
         self.output.bind("<1>", lambda event: self.output.focus_set())
 
-        Frame07 = LabelFrame(self.root2, width=50, height=40, text="Controls",
+        Frame07 = LabelFrame(self.root2, height=40, text="Controls",
                             font=("Helvetica", 10), fg='blue',bg=self.pientur)
         Frame07.grid(row=5, column=3,rowspan=3,sticky='nesw')
         
@@ -339,7 +338,7 @@ class Application(Frame):
        
             button[n] = ttk.Button(Frame07, text=controle, style='BW.TButton')
             button[n].config(command = com)
-            button[n].grid(row =n, column =3, sticky='nesw', ipadx =53)
+            button[n].grid(row =n, column =3, sticky='nesw', ipadx =36)
         ######################################################################
         #defining icons for compund menu demonstration
         self.eyeicon = PhotoImage(file='app/icons/eye.gif')
